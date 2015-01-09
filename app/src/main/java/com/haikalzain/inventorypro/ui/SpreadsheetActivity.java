@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.haikalzain.inventorypro.R;
+import com.haikalzain.inventorypro.common.Item;
 import com.haikalzain.inventorypro.common.Spreadsheet;
 
 import java.io.File;
@@ -97,7 +98,7 @@ public class SpreadsheetActivity extends ActionBarActivity {
     }
 
     private void updateItemListView(){
-        ArrayAdapter<List<String>> adapter = new ArrayAdapter<>(
+        ArrayAdapter<Item> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
                 spreadsheet.getItemList());

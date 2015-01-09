@@ -3,7 +3,6 @@ package com.haikalzain.inventorypro.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,10 +24,8 @@ public class Spreadsheet implements Serializable{
 
     private static final String SHEET_NAME = "Sheet 1";
 
-    private List<FieldType> fieldTypes;
-    private List<String> fieldNames;
-
-    private List<List<String>> data;
+    private List<Item> items;
+    private SpreadsheetHeader header;
 
     public static Spreadsheet createFromExcelFile(File inputFile) throws IOException{
 
@@ -42,11 +39,11 @@ public class Spreadsheet implements Serializable{
 
         Sheet sheet = workbook.getSheet(0);
 
-        FieldsBuilder fieldsBuilder = new FieldsBuilder();
+        SpreadsheetHeader fieldsBuilder = new SpreadsheetHeader();
         for(int i = 3; i < sheet.getColumns(); i++){//!sheet.getCell(i, 0).getContents().isEmpty()
             String contents = sheet.getCell(i, 0).getContents();
-            FieldPair pair = decodeField(contents);
-            fieldsBuilder.addField(pair.type, pair.name);
+            FieldHeader fieldHeader = decodeField(contents);
+            fieldsBuilder.addFieldHeader(fieldHeader);
         }
 
         Spreadsheet spreadsheet = new Spreadsheet(fieldsBuilder);
@@ -60,55 +57,50 @@ public class Spreadsheet implements Serializable{
         return spreadsheet;
     }
 
-    private Spreadsheet(){
-        data = new ArrayList<>();
-        fieldTypes = new ArrayList<>();
-        fieldNames = new ArrayList<>();
+    public Spreadsheet(SpreadsheetHeader header){
+        this.header = new SpreadsheetHeader(header);
+        items = new ArrayList<>();
     }
 
-    public Spreadsheet(FieldsBuilder builder){
-        this();
-        setFields(builder.getFieldTypes(), builder.getFieldNames());
-    }
-
-    private void setFields(List<FieldType> fieldTypes, List<String> fieldNames){
-        this.fieldTypes = new ArrayList<>(fieldTypes);
-        this.fieldNames = new ArrayList<>(fieldNames);
-    }
 
     public void addItem(List<String> itemData){
-        if(itemData.size() != fieldTypes.size()){
+        if(itemData.size() != header.getFieldHeaderCount()){
             throw new IllegalArgumentException("Data row incorrect size");
         }
-        data.add(new ArrayList<String>(itemData));
-    }
-
-    public int getRowCount(){
-        return data.size();
-    }
-
-    public List<String> getItem(int row){
-        return new ArrayList<>(data.get(row));
-    }
-
-    public List<List<String>> getItemList(){
-        List<List<String>> itemList = new ArrayList<>();
-        for(List<String> item: data){
-            itemList.add(item);
+        List<Field> fields = new ArrayList<>();
+        for(int i = 0; i < itemData.size(); i++){
+            Field field = new Field(header.getFieldHeader(i), itemData.get(i));
+            fields.add(field);
         }
-        return itemList;
+        items.add(new Item(fields));
     }
 
-    public void deleteItem(int row){
-        data.remove(row);
+    public int getItemCount(){
+        return items.size();
+    }
+
+    public Item getItem(int row){
+        return items.get(row);
+    }
+
+    public List<Item> getItemList(){
+        return new ArrayList<>(items);
+    }
+
+    public void deleteItem(int position){
+        items.remove(position);
+    }
+
+    public void deleteItem(Item item){
+        items.remove(item);
     }
 
     public void exportExcelToFile(File excelFile) throws IOException{
         WritableWorkbook workbook = Workbook.createWorkbook(excelFile);
         WritableSheet sheet = workbook.createSheet(SHEET_NAME, 0);
 
-        for(int i = 0; i < fieldNames.size(); i++){
-            Label label = new Label(i, 0, encodeField(fieldTypes.get(i), fieldNames.get(i)));
+        for(int i = 0; i < header.getFieldHeaderCount(); i++){
+            Label label = new Label(i, 0, encodeField(header.getFieldHeader(i)));
             try{
                 sheet.addCell(label);
             }
@@ -121,10 +113,10 @@ public class Spreadsheet implements Serializable{
             }
         }
 
-        for(int i = 0; i < data.size(); i++){
-            List<String> item = data.get(i);
-            for(int j = 0; j < item.size(); j++){
-                Label label = new Label(j, i + 1, item.get(j));
+        for(int i = 0; i < items.size(); i++){
+            Item item = items.get(i);
+            for(int j = 0; j < item.getFieldCount(); j++){
+                Label label = new Label(j, i + 1, item.getField(j).getValue());
                 try{
                     sheet.addCell(label);
                 }
@@ -148,94 +140,26 @@ public class Spreadsheet implements Serializable{
 
     }
 
-    private static String encodeField(FieldType type, String name){
-        return name + " (" + type.getName() + ")";
+    private static String encodeField(FieldHeader fieldHeader){
+        return fieldHeader.getName() + " (" + fieldHeader.getType().getName() + ")";
     }
 
-    private static FieldPair decodeField(String encodedField){
+    private static FieldHeader decodeField(String encodedField){
         String[] strings = encodedField.split("[()]");
-        FieldPair pair = new FieldPair();
-        pair.name = strings[0];
-        pair.type = FieldType.getFieldTypeFromString(strings[1]);
+        String name = strings[0];
+        FieldType type = FieldType.getFieldTypeFromString(strings[1]);
 
-        return pair;
+        return new FieldHeader(type, name);
     }
 
     public int getFieldsCount() {
-        return fieldTypes.size();
+        return header.getFieldHeaderCount();
     }
 
-    public List<FieldType> getFieldTypes() {
-        return new ArrayList<>(fieldTypes);
+    public SpreadsheetHeader getHeader(){
+        return new SpreadsheetHeader(header);
     }
 
-    public List<String> getFieldNames() {
-        return new ArrayList<>(fieldNames);
-    }
 
-    private static class FieldPair{
-        public FieldType type;
-        public String name;
-    }
 
-    @Override
-    public String toString() {
-        return "Spreadsheet{" +
-                "fieldTypes=" + fieldTypes +
-                ", fieldNames=" + fieldNames +
-                ", data=" + data +
-                '}';
-    }
-
-    public static class FieldsBuilder{
-        private List<FieldType> fieldTypes;
-        private List<String> fieldNames;
-
-        public FieldsBuilder(){
-            fieldTypes = new ArrayList<>(Arrays.asList(FieldType.TEXT, FieldType.TEXT, FieldType.POSITIVE_NUMBER));
-            fieldNames = new ArrayList<>(Arrays.asList("Barcode", "Name", "Count"));
-        }
-
-        public boolean isFieldExists(String fieldName){
-            return fieldNames.contains(fieldName);
-        }
-
-        public void addField(FieldType fieldType, String fieldName){
-            if(isFieldExists(fieldName)){
-                throw new IllegalArgumentException("Field with same name already exists");
-            }
-
-            fieldTypes.add(fieldType);
-            fieldNames.add(fieldName);
-        }
-
-        public void removeField(String fieldName){
-            int index = fieldNames.indexOf(fieldName);
-            if(index < 3){
-                throw new RuntimeException("Field removal not allowed");
-            }
-            fieldNames.remove(index);
-            fieldTypes.remove(index);
-        }
-
-        public int getFieldCount(){
-            return fieldNames.size();
-        }
-
-        public List<FieldType> getFieldTypes() {
-            return new ArrayList<>(fieldTypes);
-        }
-
-        public List<String> getFieldNames() {
-            return new ArrayList<>(fieldNames);
-        }
-
-        public FieldType getFieldType(int index){
-            return fieldTypes.get(index);
-        }
-
-        public String getFieldName(int index){
-            return fieldNames.get(index);
-        }
-    }
 }

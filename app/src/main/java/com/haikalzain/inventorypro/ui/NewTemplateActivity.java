@@ -19,8 +19,10 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.haikalzain.inventorypro.R;
+import com.haikalzain.inventorypro.common.FieldHeader;
 import com.haikalzain.inventorypro.common.FieldType;
 import com.haikalzain.inventorypro.common.Spreadsheet;
+import com.haikalzain.inventorypro.common.SpreadsheetHeader;
 import com.haikalzain.inventorypro.ui.widgets.FieldView;
 import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
 
@@ -30,7 +32,7 @@ public class NewTemplateActivity extends ActionBarActivity {
     private static final String TAG = "com.haikalzain.inventorypro.ui.NewTemplateActivity";
 
     private LinearLayout contentLayout;
-    private Spreadsheet.FieldsBuilder fieldsBuilder;
+    private SpreadsheetHeader fieldsBuilder;
     private String templateName;
 
     public static final String TEMPLATE_PARCEL = "TEMPLATE_PARCEL";
@@ -79,10 +81,10 @@ public class NewTemplateActivity extends ActionBarActivity {
             }
         });
 
-        fieldsBuilder = new Spreadsheet.FieldsBuilder();
+        fieldsBuilder = new SpreadsheetHeader();
         List<FieldType> types = fieldsBuilder.getFieldTypes();
         List<String> names = fieldsBuilder.getFieldNames();
-        for(int i = 0; i < fieldsBuilder.getFieldCount(); i++){
+        for(int i = 0; i < fieldsBuilder.getFieldHeaderCount(); i++){
             addFieldView(types.get(i), names.get(i), false);
         }
     }
@@ -125,7 +127,7 @@ public class NewTemplateActivity extends ActionBarActivity {
 
     private void addField(FieldType fieldType, String name){
         addFieldView(fieldType, name, true);
-        fieldsBuilder.addField(fieldType, name);
+        fieldsBuilder.addFieldHeader(new FieldHeader(fieldType, name));
 
     }
 
@@ -154,7 +156,7 @@ public class NewTemplateActivity extends ActionBarActivity {
     }
 
     private void removeField(FieldType fieldType, String name, View fieldView){
-        fieldsBuilder.removeField(name);
+        fieldsBuilder.removeFieldHeader(name);
         contentLayout.removeView(fieldView);
     }
 

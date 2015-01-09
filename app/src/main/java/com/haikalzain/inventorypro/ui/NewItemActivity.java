@@ -37,8 +37,8 @@ public class NewItemActivity extends ActionBarActivity {
         fieldViews = new ArrayList<>();
         spreadsheet = SpreadsheetActivity.spreadsheet;
 
-        fieldTypes = spreadsheet.getFieldTypes();
-        fieldNames = spreadsheet.getFieldNames();
+        fieldTypes = spreadsheet.getHeader().getFieldTypes();
+        fieldNames = spreadsheet.getHeader().getFieldNames();
 
         Button cancelBtn = (Button)findViewById(R.id.btn_1);
         cancelBtn.setText("Cancel");
