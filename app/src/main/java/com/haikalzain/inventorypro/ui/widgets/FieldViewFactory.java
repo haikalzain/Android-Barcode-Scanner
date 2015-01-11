@@ -42,6 +42,26 @@ public class FieldViewFactory {
         return null;
     }
 
+    public static Object getObjectForFieldType(FieldType type, String dataString){
+        switch(type){
+            case DATE:
+                break;
+            case DAY:
+                break;
+            case NUMBER:
+                return Integer.parseInt(dataString);
+            case POSITIVE_NUMBER:
+                return Integer.parseInt(dataString);
+            case DECIMAL:
+                break;
+            case PRICE:
+                break;
+            default:
+                return dataString;
+        }
+        return dataString;
+    }
+
     public static List<FieldType> getFieldTypes(){ //only returns user creatable types
         return fieldTypes;
     }

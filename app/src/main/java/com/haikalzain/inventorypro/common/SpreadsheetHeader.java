@@ -80,6 +80,10 @@ public class SpreadsheetHeader implements Serializable, Iterable<FieldHeader>{
         }
     }
 
+    public List<FieldHeader> getFields() {
+        return new ArrayList<>(fieldHeaders);
+    }
+
     @Override
     public Iterator<FieldHeader> iterator() {
         return fieldHeaders.iterator();

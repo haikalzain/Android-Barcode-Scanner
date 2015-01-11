@@ -1,5 +1,6 @@
 package com.haikalzain.inventorypro.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Item;
 import com.haikalzain.inventorypro.common.Spreadsheet;
+import com.haikalzain.inventorypro.ui.dialogs.SortDialog;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +39,7 @@ public class SpreadsheetActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_files);
+        setContentView(R.layout.activity_list_three_btn);
 
         spreadsheet = (Spreadsheet)getIntent().getSerializableExtra(SPREADSHEET);
         excelFile = (File)getIntent().getSerializableExtra(EXCEL_FILE);
@@ -45,12 +47,45 @@ public class SpreadsheetActivity extends ActionBarActivity {
         itemListView = (ListView)findViewById(R.id.list_view);
         updateItemListView();
 
-        Button newItemBtn = (Button)findViewById(R.id.new_file_btn);
+        Button newItemBtn = (Button)findViewById(R.id.btn_1);
+        newItemBtn.setText("Add Item");
         newItemBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
                 startActivityForResult(intent, NEW_ITEM_REQUEST);
+            }
+        });
+
+        Button sortBtn = (Button)findViewById(R.id.btn_2);
+        sortBtn.setText("Sort");
+        sortBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final SortDialog sortDialog = new SortDialog(
+                        SpreadsheetActivity.this,
+                        spreadsheet.getSortByOptions(),
+                        spreadsheet.getSortBy(),
+                        spreadsheet.getSortIsAscending());
+                sortDialog.setOnPositiveButtonClicked(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        spreadsheet.setSortBy(
+                                sortDialog.getSelectedField(),
+                                sortDialog.getIsAscending());
+                        updateItemListView();
+                    }
+                });
+                sortDialog.show();
+            }
+        });
+
+        Button filterBtn = (Button)findViewById(R.id.btn_3);
+        filterBtn.setText("Filter");
+        filterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }
@@ -101,7 +136,7 @@ public class SpreadsheetActivity extends ActionBarActivity {
         ArrayAdapter<Item> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
-                spreadsheet.getItemList());
+                spreadsheet.getSortedFilteredItemList());
         itemListView.setAdapter(adapter);
     }
 }

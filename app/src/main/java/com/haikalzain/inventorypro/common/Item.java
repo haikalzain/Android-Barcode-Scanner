@@ -19,6 +19,15 @@ public class Item implements Iterable<Field>, Serializable{
         return data.get(position);
     }
 
+    public Field getField(String name){
+        for(Field field: data){
+            if(field.getName().equals(name)){
+                return field;
+            }
+        }
+        return null;
+    }
+
     public int getFieldCount(){
         return data.size();
     }

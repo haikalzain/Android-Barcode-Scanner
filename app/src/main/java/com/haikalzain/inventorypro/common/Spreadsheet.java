@@ -1,10 +1,15 @@
 package com.haikalzain.inventorypro.common;
 
+import android.util.Log;
+
+import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import jxl.Sheet;
@@ -26,6 +31,8 @@ public class Spreadsheet implements Serializable{
 
     private List<Item> items;
     private SpreadsheetHeader header;
+    private FieldHeader sortBy;
+    private boolean isAscending;
 
     public static Spreadsheet createFromExcelFile(File inputFile) throws IOException{
 
@@ -58,6 +65,8 @@ public class Spreadsheet implements Serializable{
     }
 
     public Spreadsheet(SpreadsheetHeader header){
+        this.sortBy = FieldHeader.NULL;
+        this.isAscending = true;
         this.header = new SpreadsheetHeader(header);
         items = new ArrayList<>();
     }
@@ -75,6 +84,21 @@ public class Spreadsheet implements Serializable{
         items.add(new Item(fields));
     }
 
+    public List<FieldHeader> getSortByOptions(){
+        List<FieldHeader> list = new ArrayList<>();
+        list.add(FieldHeader.NULL);
+        list.addAll(header.getFields());
+        return list;
+    }
+
+    public FieldHeader getSortBy(){
+        return sortBy;
+    }
+
+    public boolean getSortIsAscending(){
+        return isAscending;
+    }
+
     public int getItemCount(){
         return items.size();
     }
@@ -85,6 +109,46 @@ public class Spreadsheet implements Serializable{
 
     public List<Item> getItemList(){
         return new ArrayList<>(items);
+    }
+
+    public List<Item> getSortedFilteredItemList(){
+        Log.v(TAG, "Value of sortBy: " + sortBy.toString());
+        if(sortBy.getName().equals(FieldHeader.NULL.getName())){
+            Log.v(TAG, "SortBy is null");
+            return getItemList();
+        }
+        Comparator<Item> comparator = new Comparator<Item>() {
+            @Override
+            public int compare(Item lhs, Item rhs) {
+                if(isAscending)
+                    return getComparableObject(lhs).compareTo(getComparableObject(rhs));
+                else
+                    return getComparableObject(rhs).compareTo(getComparableObject(lhs));
+            }
+            private Comparable getComparableObject(Item item){
+                Field field = item.getField(sortBy.getName());
+                Object obj = FieldViewFactory.getObjectForFieldType(
+                        field.getType(), field.getValue());
+                return (Comparable)obj;
+            }
+        };
+
+        List<Item> list = getItemList();
+
+        Collections.sort(list, comparator);
+        Log.v(TAG, "Sorted list: " + list.toString());
+        return list;
+        // TODO implement filter
+    }
+
+    //use null to unset sort
+    public void setSortBy(FieldHeader fieldHeader, boolean isAscending){
+        this.sortBy = fieldHeader;
+        this.isAscending = isAscending;
+    }
+
+    public void setSortBy(FieldHeader fieldHeader){
+        setSortBy(fieldHeader, false);
     }
 
     public void deleteItem(int position){
