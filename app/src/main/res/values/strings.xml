@@ -9,5 +9,6 @@
     <string name="title_activity_new_template">NewTemplateActivity</string>
     <string name="title_activity_spreadsheet">SpreadsheetActivity</string>
     <string name="title_activity_new_item">NewItemActivity</string>
+    <string name="title_activity_filter">FilterActivity</string>
 
 </resources>

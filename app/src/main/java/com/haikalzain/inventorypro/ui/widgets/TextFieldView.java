@@ -13,6 +13,10 @@ public class TextFieldView extends FieldView {
 
     private EditText editText;
 
+    public TextFieldView(Context context, String label, boolean isFilterView) {
+        super(context, label, isFilterView);
+    }
+
     public TextFieldView(Context context, String label) {
         super(context, label);
     }

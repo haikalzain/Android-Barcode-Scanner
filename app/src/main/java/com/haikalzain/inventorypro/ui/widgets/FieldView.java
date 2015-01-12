@@ -6,13 +6,17 @@ import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.FieldType;
+import com.haikalzain.inventorypro.common.conditions.Condition;
+import com.haikalzain.inventorypro.utils.ConditionUtils;
 
 /**
  * Created by haikalzain on 6/01/15.
@@ -26,16 +30,36 @@ public abstract class FieldView extends FrameLayout {
     private boolean isDialog;
     private EditText editText;
     private boolean disabledInput;
+    boolean isFilterView;
+    private ArrayAdapter<Condition> adapter;
 
-    public FieldView(Context context, String label) {
+    private Spinner spinner;
+
+    public FieldView(Context context, String label){
+        this(context, label, false);
+    }
+
+    public FieldView(Context context, String label, boolean isFilterView) {
         super(context);
         this.label = label;
         this.isDialog = isDialog();
         this.context = context;
         this.disabledInput = false;
+        this.isFilterView = isFilterView;
 
+        if(isFilterView){
+            LayoutInflater.from(context).inflate(R.layout.field_filter_view, this);
+            spinner = (Spinner)findViewById(R.id.spinner);
 
-        LayoutInflater.from(context).inflate(R.layout.field_view, this);
+            adapter = new ArrayAdapter<>(
+                    context,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    FieldViewFactory.getFiltersForFieldType(getFieldType()));
+            spinner.setAdapter(adapter);
+        }
+        else {
+            LayoutInflater.from(context).inflate(R.layout.field_view, this);
+        }
         ((TextView)findViewById(R.id.textView)).setText(getLabel());
         FrameLayout layout = ((FrameLayout)findViewById(R.id.input_container));
 
@@ -76,8 +100,6 @@ public abstract class FieldView extends FrameLayout {
             layout.addView(editText);
         }
 
-        //noinspection ResourceType
-        ((LinearLayout)findViewById(R.id.linear_layout)).setOrientation(getOrientation()); //TODO remove
     }
 
     protected abstract View createInputView(Context context);
@@ -103,6 +125,11 @@ public abstract class FieldView extends FrameLayout {
 
     protected abstract String getInputDataString();
 
+    public Condition getFilterCondition(){
+        if(!this.isFilterView) return null;
+        return (Condition)spinner.getSelectedItem();
+    }
+
     protected boolean isDialog(){
         return false;
     }
@@ -120,13 +147,20 @@ public abstract class FieldView extends FrameLayout {
         }
     }
 
-    public int getOrientation(){
-        return LinearLayout.VERTICAL;
-    }
-
     public void disableInput(){
         setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
         disabledInput = true;
     }
 
+    public void setSelectedFilterCondition(Condition filterCondition) {
+        if(!this.isFilterView){
+            throw new RuntimeException("This is not a FilterView");
+        }
+        for(int i = 0; i < adapter.getCount(); i++){
+            Condition c = adapter.getItem(i);
+            if(c.equals(filterCondition)){
+                spinner.setSelection(i);
+            }
+        }
+    }
 }

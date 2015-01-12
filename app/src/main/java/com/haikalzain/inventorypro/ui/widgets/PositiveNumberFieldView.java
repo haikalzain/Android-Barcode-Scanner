@@ -12,8 +12,8 @@ import com.haikalzain.inventorypro.common.FieldType;
 public class PositiveNumberFieldView extends FieldView {
     private NumberPicker numberPicker;
 
-    public PositiveNumberFieldView(Context context, String label) {
-        super(context, label);
+    public PositiveNumberFieldView(Context context, String label, boolean isFilterView) {
+        super(context, label, isFilterView);
     }
 
     @Override

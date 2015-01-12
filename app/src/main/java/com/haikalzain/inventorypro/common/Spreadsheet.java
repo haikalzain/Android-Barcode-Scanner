@@ -2,6 +2,7 @@ package com.haikalzain.inventorypro.common;
 
 import android.util.Log;
 
+import com.haikalzain.inventorypro.common.conditions.Condition;
 import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
 
 import java.io.File;
@@ -33,6 +34,8 @@ public class Spreadsheet implements Serializable{
     private SpreadsheetHeader header;
     private FieldHeader sortBy;
     private boolean isAscending;
+    private List<Condition> filterConditions;
+    private List<String> filterItems;
 
     public static Spreadsheet createFromExcelFile(File inputFile) throws IOException{
 
@@ -68,6 +71,15 @@ public class Spreadsheet implements Serializable{
         this.sortBy = FieldHeader.NULL;
         this.isAscending = true;
         this.header = new SpreadsheetHeader(header);
+        this.filterConditions = new ArrayList<>();
+        this.filterItems = new ArrayList<>();
+
+        for(FieldHeader h: header){
+            filterConditions.add(Condition.NULL);
+            filterItems.add(FieldViewFactory.getDefaultValue(h.getType()));
+        }
+
+
         items = new ArrayList<>();
     }
 
@@ -112,11 +124,39 @@ public class Spreadsheet implements Serializable{
     }
 
     public List<Item> getSortedFilteredItemList(){
-        Log.v(TAG, "Value of sortBy: " + sortBy.toString());
+        List<Item> filtered = new ArrayList<>();
+        for(Item item: items){
+            boolean accept = true;
+            for(int i = 0; i < item.getFieldCount(); i++){
+                Condition condition = filterConditions.get(i);
+                Log.v(TAG, "Condition: " + condition.toString());
+                if(condition.toString().equals("None")){
+                    continue;
+                }
+                Field currentField = item.getField(i);
+                String compareItem = filterItems.get(i);
+                if(!condition.evaluate(
+                        FieldViewFactory.getObjectForFieldType(
+                                currentField.getType(),
+                                currentField.getValue()),
+                        FieldViewFactory.getObjectForFieldType(
+                                currentField.getType(),
+                                compareItem)
+                )){
+                    accept = false;
+                    break;
+                }
+            }
+            if(accept){
+                filtered.add(item);
+            }
+        }
+
         if(sortBy.getName().equals(FieldHeader.NULL.getName())){
             Log.v(TAG, "SortBy is null");
-            return getItemList();
+            return filtered;
         }
+
         Comparator<Item> comparator = new Comparator<Item>() {
             @Override
             public int compare(Item lhs, Item rhs) {
@@ -133,11 +173,11 @@ public class Spreadsheet implements Serializable{
             }
         };
 
-        List<Item> list = getItemList();
 
-        Collections.sort(list, comparator);
-        Log.v(TAG, "Sorted list: " + list.toString());
-        return list;
+
+        Collections.sort(filtered, comparator);
+        //Log.v(TAG, "Sorted list: " + filtered.toString());
+        return filtered;
         // TODO implement filter
     }
 
@@ -149,6 +189,19 @@ public class Spreadsheet implements Serializable{
 
     public void setSortBy(FieldHeader fieldHeader){
         setSortBy(fieldHeader, false);
+    }
+
+    public void setFilters(List<Condition> filterConditions, List<String> filterItems){
+        this.filterConditions = new ArrayList<>(filterConditions);
+        this.filterItems = new ArrayList<>(filterItems);
+    }
+
+    public List<Condition> getFilterConditions(){
+        return new ArrayList<>(filterConditions);
+    }
+
+    public List<String> getFilterItems(){
+        return new ArrayList<>(filterItems);
     }
 
     public void deleteItem(int position){

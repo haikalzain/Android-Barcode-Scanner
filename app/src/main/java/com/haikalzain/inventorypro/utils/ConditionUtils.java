@@ -13,11 +13,13 @@ import java.util.List;
  */
 public class ConditionUtils {
     public final static List<Condition> STRING_FILTER_CONDITIONS = Arrays.asList(
+            Condition.NULL,
             new EqualsCondition(),
             new GreaterThanCondition(),
             new StartsWithCondition()
     );
     public final static List<Condition> GENERAL_FILTER_CONDITIONS = Arrays.asList(
+            Condition.NULL,
             new EqualsCondition(),
             new GreaterThanCondition()
     );

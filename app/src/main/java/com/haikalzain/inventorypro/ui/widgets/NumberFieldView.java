@@ -15,8 +15,8 @@ public class NumberFieldView extends FieldView {
     private final int max_value = 1000000000;
     private final int min_value = -1000000000;
 
-    public NumberFieldView(Context context, String label) {
-        super(context, label);
+    public NumberFieldView(Context context, String label, boolean isFilterView) {
+        super(context, label, isFilterView);
     }
 
     @Override

@@ -12,8 +12,8 @@ import com.haikalzain.inventorypro.common.FieldType;
 public class LongTextFieldView extends FieldView{
     private EditText editText;
 
-    public LongTextFieldView(Context context, String label) {
-        super(context, label);
+    public LongTextFieldView(Context context, String label, boolean isFilterView) {
+        super(context, label, isFilterView);
     }
 
     @Override

@@ -15,6 +15,7 @@ import android.widget.ListView;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Item;
 import com.haikalzain.inventorypro.common.Spreadsheet;
+import com.haikalzain.inventorypro.common.conditions.Condition;
 import com.haikalzain.inventorypro.ui.dialogs.SortDialog;
 
 import java.io.File;
@@ -27,6 +28,7 @@ public class SpreadsheetActivity extends ActionBarActivity {
     private static final String TAG = "com.haikalzain.inventorypro.ui.SpreadsheetActivity";
 
     private static final int NEW_ITEM_REQUEST = 1;
+    private static final int FILTER_REQUEST = 2;
 
     public static final String SPREADSHEET = "SPREADSHEET";
     public static final String EXCEL_FILE = "EXCEL_FILE";
@@ -85,7 +87,14 @@ public class SpreadsheetActivity extends ActionBarActivity {
         filterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(SpreadsheetActivity.this, FilterActivity.class);
+                intent.putExtra(
+                        FilterActivity.INIT_FILTER_CONDITIONS,
+                        new ArrayList<>(spreadsheet.getFilterConditions()));
+                intent.putExtra(
+                        FilterActivity.INIT_FILTER_ITEMS,
+                        new ArrayList<>(spreadsheet.getFilterItems()));
+                startActivityForResult(intent, FILTER_REQUEST);
             }
         });
     }
@@ -127,6 +136,17 @@ public class SpreadsheetActivity extends ActionBarActivity {
                 } catch (IOException e) {
                     Log.e(TAG, "failed to update: " + excelFile.toString());
                 }
+                updateItemListView();
+            }
+        }
+        else if(requestCode == FILTER_REQUEST){
+            if(resultCode == RESULT_OK){
+                ArrayList<Condition> filterConditions =
+                        (ArrayList<Condition>)data.getSerializableExtra(
+                                FilterActivity.FILTER_CONDITIONS);
+                ArrayList<String> filterItems =
+                        (ArrayList<String>)data.getSerializableExtra(FilterActivity.FILTER_ITEMS);
+                spreadsheet.setFilters(filterConditions, filterItems);
                 updateItemListView();
             }
         }
