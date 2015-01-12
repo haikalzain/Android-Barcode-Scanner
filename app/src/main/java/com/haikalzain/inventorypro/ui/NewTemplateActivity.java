@@ -28,7 +28,7 @@ import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
 
 import java.util.List;
 
-public class NewTemplateActivity extends ActionBarActivity {
+public class NewTemplateActivity extends Activity {
     private static final String TAG = "com.haikalzain.inventorypro.ui.NewTemplateActivity";
 
     private LinearLayout contentLayout;

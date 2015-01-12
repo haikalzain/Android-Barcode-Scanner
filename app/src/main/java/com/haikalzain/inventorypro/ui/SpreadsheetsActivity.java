@@ -1,5 +1,6 @@
 package com.haikalzain.inventorypro.ui;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -22,7 +23,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class SpreadsheetsActivity extends ActionBarActivity {
+public class SpreadsheetsActivity extends Activity {
     private static final String TAG = "com.haikalzain.inventorypro.ui.SpreadsheetsActivity";
 
     private ListView spreadsheetListView;

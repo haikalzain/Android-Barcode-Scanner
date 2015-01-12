@@ -73,6 +73,7 @@ public abstract class FieldView extends FrameLayout {
             editText = new EditText(context);
             editText.setText(getDefaultValue());
             editText.setFocusable(false);
+            //editText.setHint("Click to edit");
             editText.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -131,7 +132,7 @@ public abstract class FieldView extends FrameLayout {
     }
 
     protected boolean isDialog(){
-        return false;
+        return true;
     }
 
     protected String getDefaultValue(){

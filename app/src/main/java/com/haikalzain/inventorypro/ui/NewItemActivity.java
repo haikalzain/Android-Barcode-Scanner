@@ -1,5 +1,6 @@
 package com.haikalzain.inventorypro.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -18,7 +19,7 @@ import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewItemActivity extends ActionBarActivity {
+public class NewItemActivity extends Activity {
 
     public static final String ITEM = "ITEM";
 

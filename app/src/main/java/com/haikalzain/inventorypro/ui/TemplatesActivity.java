@@ -1,5 +1,6 @@
 package com.haikalzain.inventorypro.ui;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -22,7 +23,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 
-public class TemplatesActivity extends ActionBarActivity {
+public class TemplatesActivity extends Activity {
     private static final String TAG = "com.haikalzain.inventorypro.ui.TemplatesActivity";
 
     private static final int NEW_TEMPLATE_REQUEST = 1;

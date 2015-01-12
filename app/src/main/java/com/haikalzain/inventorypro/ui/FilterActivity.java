@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Created by haikalzain on 11/01/15.
  */
-public class FilterActivity extends ActionBarActivity {
+public class FilterActivity extends Activity {
     private static final String TAG = "com.haikalzain.inventorypro.ui.FilterActivity";
 
     private LinearLayout contentLayout;
