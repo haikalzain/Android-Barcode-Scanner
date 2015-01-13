@@ -7,17 +7,39 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
+import com.haikalzain.inventorypro.common.Field;
+import com.haikalzain.inventorypro.common.FieldHeader;
+import com.haikalzain.inventorypro.common.Item;
+import com.haikalzain.inventorypro.common.Spreadsheet;
+import com.haikalzain.inventorypro.common.conditions.Condition;
+import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
 public class ScanActivity extends Activity {
+
+    private static final String TAG = "com.haikalzain.inventorypro.ui.ScanActivity";
+
+    private static final int NEW_ITEM_REQUEST = 1;
+    private static final int EDIT_ITEM_REQUEST = 3;
+
+    private App app;
+
+    private Spreadsheet spreadsheet;
+    private File excelFile;
 
     private ZBarScannerView scannerView;
     private boolean autoFocus;
@@ -30,23 +52,16 @@ public class ScanActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
+        app = (App)getApplication();
+        spreadsheet = app.currentSpreadsheet;
+        excelFile = app.currentExcelFile;
+
         autoFocus = true;
         flash = false;
 
         FrameLayout layout = (FrameLayout)findViewById(R.id.main_layout);
 
         scannerView = new ZBarScannerView(this);
-        scannerView.setResultHandler(new ZBarScannerView.ResultHandler() {
-            @Override
-            public void handleResult(Result result) {
-                try {
-                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-                    r.play();
-                } catch (Exception e) {}
-                //TODO call newItemActivity
-            }
-        });
         layout.addView(scannerView);
     }
 
@@ -85,8 +100,89 @@ public class ScanActivity extends Activity {
     }
 
     private void startScanner(){
+        scannerView.setResultHandler(new ZBarScannerView.ResultHandler() {
+            @Override
+            public void handleResult(Result result) {
+                try {
+                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                    r.play();
+                } catch (Exception e) {}
+                String barcode = result.getContents();
+                Item item = spreadsheet.getItem(barcode);
+
+                if(item == null) {
+                    startNewItemActivity(barcode);
+                }
+                else{
+                    startEditItemActivity(item);
+                }
+            }
+        });
         scannerView.startCamera();
         scannerView.setAutoFocus(autoFocus);
         scannerView.setFlash(flash);
+    }
+    private ArrayList<String> getDefaultValues() {
+        ArrayList<String> list = new ArrayList<>();
+        for(FieldHeader f: spreadsheet.getHeader()){
+            list.add(FieldViewFactory.getDefaultValue(f.getType()));
+        }
+        return list;
+    }
+
+    private ArrayList<String> getValues(Item item){
+        ArrayList<String> list = new ArrayList<>();
+        for(Field f: item){
+            list.add(f.getValue());
+        }
+        return list;
+    }
+
+    private void startEditItemActivity(Item item){
+        app.currentItem = item;
+        Intent intent = new Intent(ScanActivity.this, NewItemActivity.class);
+        intent.putExtra(NewItemActivity.INIT_VALUES, getValues(item));
+        intent.putExtra(NewItemActivity.IS_EDITING, true);
+        startActivityForResult(intent, EDIT_ITEM_REQUEST);
+    }
+
+    private void startNewItemActivity(String barcode){
+        Intent intent = new Intent(ScanActivity.this, NewItemActivity.class);
+        ArrayList<String> values = getDefaultValues();
+        values.set(0, barcode);
+        intent.putExtra(NewItemActivity.INIT_VALUES, values);
+        startActivityForResult(intent, NEW_ITEM_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == NEW_ITEM_REQUEST){
+            if(resultCode == RESULT_OK){
+                ArrayList<String> item =
+                        (ArrayList<String>)data.getSerializableExtra(NewItemActivity.ITEM);
+                spreadsheet.addItem(item);
+                try {
+                    spreadsheet.exportExcelToFile(excelFile);
+                } catch (IOException e) {
+                    Log.e(TAG, "failed to update: " + excelFile.toString());
+                }
+            }
+        }
+        else if(requestCode == EDIT_ITEM_REQUEST){
+            if(resultCode == RESULT_OK){
+                ArrayList<String> item =
+                        (ArrayList<String>)data.getSerializableExtra(NewItemActivity.ITEM);
+                spreadsheet.deleteItem(app.currentItem);
+                spreadsheet.addItem(item);
+                try {
+                    spreadsheet.exportExcelToFile(excelFile);
+                } catch (IOException e) {
+                    Log.e(TAG, "failed to update: " + excelFile.toString());
+                }
+            }
+        }
     }
 }

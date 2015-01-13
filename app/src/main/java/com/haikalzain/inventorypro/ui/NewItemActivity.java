@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.FieldType;
 import com.haikalzain.inventorypro.common.Spreadsheet;
@@ -39,7 +40,7 @@ public class NewItemActivity extends Activity {
         setContentView(R.layout.activity_container_two_btn);
 
         fieldViews = new ArrayList<>();
-        spreadsheet = SpreadsheetActivity.spreadsheet;
+        spreadsheet = ((App)getApplication()).currentSpreadsheet;
 
         fieldTypes = spreadsheet.getHeader().getFieldTypes();
         fieldNames = spreadsheet.getHeader().getFieldNames();
@@ -67,7 +68,7 @@ public class NewItemActivity extends Activity {
 
         contentLayout = (LinearLayout)findViewById(R.id.main_layout);
         createContentLayout();
-        
+
         if(getIntent().getBooleanExtra(IS_EDITING, false)){
             setTitle("Edit Item");
         }

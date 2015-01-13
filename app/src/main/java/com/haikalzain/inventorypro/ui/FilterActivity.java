@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.FieldHeader;
 import com.haikalzain.inventorypro.common.FieldType;
@@ -87,7 +88,7 @@ public class FilterActivity extends Activity {
             }
         });
 
-        Spreadsheet spreadsheet = SpreadsheetActivity.spreadsheet;
+        Spreadsheet spreadsheet = ((App)getApplication()).currentSpreadsheet;
         for(FieldHeader header: spreadsheet.getHeader()){
             FieldView fieldView = FieldViewFactory.createFieldViewForType(
                     this, header.getType(), header.getName(), true);

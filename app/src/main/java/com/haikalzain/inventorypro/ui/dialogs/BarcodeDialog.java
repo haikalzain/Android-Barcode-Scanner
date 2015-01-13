@@ -46,6 +46,7 @@ public class BarcodeDialog {
                 });
 
         fileEdit = (EditText)rootView.findViewById(R.id.editText);
+        fileEdit.setHint("Barcode");
         fileEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

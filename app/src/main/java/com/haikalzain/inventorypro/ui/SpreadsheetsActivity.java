@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Spreadsheet;
 import com.haikalzain.inventorypro.ui.dialogs.NewSpreadsheetDialog;
@@ -138,8 +139,11 @@ public class SpreadsheetsActivity extends Activity {
             Log.e(TAG, "Failed to read spreadsheet: " + file.toString());
         }
         Intent intent = new Intent(this, SpreadsheetActivity.class);
-        intent.putExtra(SpreadsheetActivity.SPREADSHEET, spreadsheet);
-        intent.putExtra(SpreadsheetActivity.EXCEL_FILE, file);
+
+        App app = (App)getApplication();
+        app.currentSpreadsheet = spreadsheet;
+        app.currentExcelFile = file;
+
         startActivity(intent);
     }
 

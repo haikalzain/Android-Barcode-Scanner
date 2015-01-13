@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 
+import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Field;
 import com.haikalzain.inventorypro.common.FieldHeader;
@@ -38,30 +39,34 @@ public class SpreadsheetActivity extends Activity {
     private static final int NEW_ITEM_REQUEST = 1;
     private static final int FILTER_REQUEST = 2;
     private static final int EDIT_ITEM_REQUEST = 3;
+    private static final int SCAN_REQUEST = 4;
 
     public static final String SPREADSHEET = "SPREADSHEET";
     public static final String EXCEL_FILE = "EXCEL_FILE";
+    public static final String CURRENT_ITEM = "CURRENT_ITEM";
+
+    private App app;
+
 
 
     private ListView itemListView;
-    public static Spreadsheet spreadsheet = null; //since only 1 of this activity running at a time
+    private Spreadsheet spreadsheet = null; //since only 1 of this activity running at a time
     private File excelFile;
-    private Item currentItem; // Item being edited
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_three_btn);
 
-        spreadsheet = (Spreadsheet)getIntent().getSerializableExtra(SPREADSHEET);
-        excelFile = (File)getIntent().getSerializableExtra(EXCEL_FILE);
+        app = (App)getApplication();
+        spreadsheet = app.currentSpreadsheet;
+        excelFile = app.currentExcelFile;
 
-        currentItem = null;
+        Log.v(TAG, "Recreating activity");
+
 
         itemListView = (ListView)findViewById(R.id.list_view);
         updateItemListView();
-
-
 
         Button newItemBtn = (Button)findViewById(R.id.btn_1);
         final PopupMenu newItemMenu = new PopupMenu(this, newItemBtn);
@@ -74,7 +79,7 @@ public class SpreadsheetActivity extends Activity {
                 switch(item.getItemId()){
                     case 1:
                         intent = new Intent(SpreadsheetActivity.this, ScanActivity.class);
-                        startActivity(intent);
+                        startActivityForResult(intent, SCAN_REQUEST);
                         break;
                     case 2:
                         showBarcodeDialog();
@@ -131,7 +136,6 @@ public class SpreadsheetActivity extends Activity {
         });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -175,7 +179,7 @@ public class SpreadsheetActivity extends Activity {
             if(resultCode == RESULT_OK){
                 ArrayList<String> item =
                         (ArrayList<String>)data.getSerializableExtra(NewItemActivity.ITEM);
-                spreadsheet.deleteItem(currentItem);
+                spreadsheet.deleteItem(app.currentItem);
                 spreadsheet.addItem(item);
                 try {
                     spreadsheet.exportExcelToFile(excelFile);
@@ -199,10 +203,14 @@ public class SpreadsheetActivity extends Activity {
     }
 
     private void updateItemListView(){
+        if(spreadsheet == null){
+            Log.e(TAG, "spreadsheet is null!");
+        }
         final ArrayAdapter<Item> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
                 spreadsheet.getSortedFilteredItemList());
+
         itemListView.setAdapter(adapter);
         itemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -249,7 +257,7 @@ public class SpreadsheetActivity extends Activity {
     }
 
     private void startEditItemActivity(Item item){
-        currentItem = item;
+        app.currentItem = item;
         Intent intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
         intent.putExtra(NewItemActivity.INIT_VALUES, getValues(item));
         intent.putExtra(NewItemActivity.IS_EDITING, true);
