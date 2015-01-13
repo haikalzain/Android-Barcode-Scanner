@@ -1,6 +1,7 @@
 package com.haikalzain.inventorypro.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -21,6 +22,7 @@ import com.haikalzain.inventorypro.common.FieldHeader;
 import com.haikalzain.inventorypro.common.Item;
 import com.haikalzain.inventorypro.common.Spreadsheet;
 import com.haikalzain.inventorypro.common.conditions.Condition;
+import com.haikalzain.inventorypro.ui.dialogs.BarcodeDialog;
 import com.haikalzain.inventorypro.ui.dialogs.SortDialog;
 import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
 
@@ -63,8 +65,8 @@ public class SpreadsheetActivity extends Activity {
 
         Button newItemBtn = (Button)findViewById(R.id.btn_1);
         final PopupMenu newItemMenu = new PopupMenu(this, newItemBtn);
-        newItemMenu.getMenu().add(Menu.NONE, 1, Menu.NONE, "Scan");
-        newItemMenu.getMenu().add(Menu.NONE, 2, Menu.NONE, "Manual");
+        newItemMenu.getMenu().add(Menu.NONE, 1, Menu.NONE, "By scanning");
+        newItemMenu.getMenu().add(Menu.NONE, 2, Menu.NONE, "Manually");
         newItemMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -75,15 +77,13 @@ public class SpreadsheetActivity extends Activity {
                         startActivity(intent);
                         break;
                     case 2:
-                        intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
-                        intent.putExtra(NewItemActivity.INIT_VALUES, getDefaultValues());
-                        startActivityForResult(intent, NEW_ITEM_REQUEST);
+                        showBarcodeDialog();
                         break;
                 }
                 return false;
             }
         });
-        newItemBtn.setText("Add Item");
+        newItemBtn.setText("Edit");
         newItemBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -208,12 +208,7 @@ public class SpreadsheetActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Item item = adapter.getItem(position);
-                currentItem = item;
-                Intent intent;
-                intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
-                intent.putExtra(NewItemActivity.INIT_VALUES, getValues(item));
-                intent.putExtra(NewItemActivity.IS_EDITING, true);
-                startActivityForResult(intent, EDIT_ITEM_REQUEST);
+                startEditItemActivity(item);
             }
         });
     }
@@ -232,5 +227,40 @@ public class SpreadsheetActivity extends Activity {
             list.add(f.getValue());
         }
         return list;
+    }
+
+    private void showBarcodeDialog(){
+        final BarcodeDialog dialog = new BarcodeDialog(this);
+        dialog.setOnPositiveButtonClicked(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface d, int which) {
+                String barcode = dialog.getBarcode();
+                Item item = spreadsheet.getItem(barcode);
+
+                if(item == null) {
+                    startNewItemActivity(barcode);
+                }
+                else{
+                    startEditItemActivity(item);
+                }
+            }
+        });
+        dialog.show();
+    }
+
+    private void startEditItemActivity(Item item){
+        currentItem = item;
+        Intent intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
+        intent.putExtra(NewItemActivity.INIT_VALUES, getValues(item));
+        intent.putExtra(NewItemActivity.IS_EDITING, true);
+        startActivityForResult(intent, EDIT_ITEM_REQUEST);
+    }
+
+    private void startNewItemActivity(String barcode){
+        Intent intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
+        ArrayList<String> values = getDefaultValues();
+        values.set(0, barcode);
+        intent.putExtra(NewItemActivity.INIT_VALUES, values);
+        startActivityForResult(intent, NEW_ITEM_REQUEST);
     }
 }

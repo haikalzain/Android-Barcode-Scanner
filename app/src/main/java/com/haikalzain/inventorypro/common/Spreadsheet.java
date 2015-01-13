@@ -24,6 +24,7 @@ import jxl.write.biff.RowsExceededException;
 
 /**
  * Created by haikalzain on 7/01/15.
+ * Barcodes must be unique.
  */
 public class Spreadsheet implements Serializable{
     private static final String TAG = "com.haikalzain.inventorypro.common.Spreadsheet";
@@ -119,6 +120,15 @@ public class Spreadsheet implements Serializable{
         return items.get(row);
     }
 
+    public Item getItem(String barcode){
+        for(Item item: items){
+            if(item.getField("Barcode").getValue().equals(barcode)){
+                return item;
+            }
+        }
+        return null;
+    }
+
     public List<Item> getItemList(){
         return new ArrayList<>(items);
     }
@@ -210,6 +220,10 @@ public class Spreadsheet implements Serializable{
 
     public void deleteItem(Item item){
         items.remove(item);
+    }
+
+    public void deleteItem(String barcode){
+        deleteItem(getItem(barcode));
     }
 
     public void exportExcelToFile(File excelFile) throws IOException{
