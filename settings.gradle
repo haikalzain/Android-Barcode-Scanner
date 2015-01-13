@@ -1,1 +1,1 @@
-include ':app', ':jxl'
+include ':app', ':jxl', ':barcodescanner'

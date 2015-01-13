@@ -69,10 +69,12 @@ public class SpreadsheetHeader implements Serializable, Iterable<FieldHeader>{
     }
 
     public void removeFieldHeader(String name){
-        for(FieldHeader f: fieldHeaders){
-            if(PROTECTED_FIELDS.contains(f)){
+        for(FieldHeader f: PROTECTED_FIELDS){
+            if(f.getName().equals(name)){
                 throw new RuntimeException("Can't delete a protected field");
             }
+        }
+        for(FieldHeader f: fieldHeaders){
             if(f.getName().equals(name)){
                 fieldHeaders.remove(f);
                 return;

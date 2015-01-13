@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Item;
@@ -50,13 +51,34 @@ public class SpreadsheetActivity extends Activity {
         itemListView = (ListView)findViewById(R.id.list_view);
         updateItemListView();
 
+
+
         Button newItemBtn = (Button)findViewById(R.id.btn_1);
+        final PopupMenu newItemMenu = new PopupMenu(this, newItemBtn);
+        newItemMenu.getMenu().add(Menu.NONE, 1, Menu.NONE, "Scan");
+        newItemMenu.getMenu().add(Menu.NONE, 2, Menu.NONE, "Manual");
+        newItemMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent;
+                switch(item.getItemId()){
+                    case 1:
+                        intent = new Intent(SpreadsheetActivity.this, ScanActivity.class);
+                        startActivity(intent);
+                        break;
+                    case 2:
+                        intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
+                        startActivityForResult(intent, NEW_ITEM_REQUEST);
+                        break;
+                }
+                return false;
+            }
+        });
         newItemBtn.setText("Add Item");
         newItemBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
-                startActivityForResult(intent, NEW_ITEM_REQUEST);
+                newItemMenu.show();
             }
         });
 

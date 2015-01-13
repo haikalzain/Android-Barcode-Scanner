@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.haikalzain.inventorypro" >
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.camera.flash" android:required="true" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -48,6 +55,14 @@
         <activity
             android:name=".ui.FilterActivity"
             android:label="@string/title_activity_filter" >
+        </activity>
+        <activity
+            android:name=".ui.ScanActivity"
+            android:label="@string/title_activity_scan"
+            android:parentActivityName=".ui.SpreadsheetActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.haikalzain.inventorypro.ui.SpreadsheetActivity" />
         </activity>
     </application>
 

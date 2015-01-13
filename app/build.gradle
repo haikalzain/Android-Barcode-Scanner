@@ -23,4 +23,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile project(':jxl')
+    compile 'me.dm7.barcodescanner:zbar:1.6'
 }
