@@ -22,6 +22,9 @@ import java.util.List;
 public class NewItemActivity extends Activity {
 
     public static final String ITEM = "ITEM";
+    public static final String INIT_VALUES = "INIT_VALUES";
+    public static final String IS_EDITING = "IS EDITING";
+
 
     private LinearLayout contentLayout;
     private List<FieldType> fieldTypes;
@@ -65,7 +68,20 @@ public class NewItemActivity extends Activity {
         contentLayout = (LinearLayout)findViewById(R.id.main_layout);
         createContentLayout();
         
-        setTitle("New Item");
+        if(getIntent().getBooleanExtra(IS_EDITING, false)){
+            setTitle("Edit Item");
+        }
+        else{
+            setTitle("New Item");
+        }
+
+        //setting initial values
+        ArrayList<String> initValues =
+                (ArrayList<String>)getIntent().getSerializableExtra(INIT_VALUES);
+        for(int i = 0; i < fieldViews.size(); i++){
+            fieldViews.get(i).setValue(initValues.get(i));
+        }
+
     }
 
     private void createContentLayout(){

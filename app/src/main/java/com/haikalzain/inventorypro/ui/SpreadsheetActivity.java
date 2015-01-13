@@ -9,16 +9,20 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 
 import com.haikalzain.inventorypro.R;
+import com.haikalzain.inventorypro.common.Field;
+import com.haikalzain.inventorypro.common.FieldHeader;
 import com.haikalzain.inventorypro.common.Item;
 import com.haikalzain.inventorypro.common.Spreadsheet;
 import com.haikalzain.inventorypro.common.conditions.Condition;
 import com.haikalzain.inventorypro.ui.dialogs.SortDialog;
+import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +35,7 @@ public class SpreadsheetActivity extends Activity {
 
     private static final int NEW_ITEM_REQUEST = 1;
     private static final int FILTER_REQUEST = 2;
+    private static final int EDIT_ITEM_REQUEST = 3;
 
     public static final String SPREADSHEET = "SPREADSHEET";
     public static final String EXCEL_FILE = "EXCEL_FILE";
@@ -39,6 +44,7 @@ public class SpreadsheetActivity extends Activity {
     private ListView itemListView;
     public static Spreadsheet spreadsheet = null; //since only 1 of this activity running at a time
     private File excelFile;
+    private Item currentItem; // Item being edited
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,8 @@ public class SpreadsheetActivity extends Activity {
 
         spreadsheet = (Spreadsheet)getIntent().getSerializableExtra(SPREADSHEET);
         excelFile = (File)getIntent().getSerializableExtra(EXCEL_FILE);
+
+        currentItem = null;
 
         itemListView = (ListView)findViewById(R.id.list_view);
         updateItemListView();
@@ -68,6 +76,7 @@ public class SpreadsheetActivity extends Activity {
                         break;
                     case 2:
                         intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
+                        intent.putExtra(NewItemActivity.INIT_VALUES, getDefaultValues());
                         startActivityForResult(intent, NEW_ITEM_REQUEST);
                         break;
                 }
@@ -162,6 +171,20 @@ public class SpreadsheetActivity extends Activity {
                 updateItemListView();
             }
         }
+        else if(requestCode == EDIT_ITEM_REQUEST){
+            if(resultCode == RESULT_OK){
+                ArrayList<String> item =
+                        (ArrayList<String>)data.getSerializableExtra(NewItemActivity.ITEM);
+                spreadsheet.deleteItem(currentItem);
+                spreadsheet.addItem(item);
+                try {
+                    spreadsheet.exportExcelToFile(excelFile);
+                } catch (IOException e) {
+                    Log.e(TAG, "failed to update: " + excelFile.toString());
+                }
+                updateItemListView();
+            }
+        }
         else if(requestCode == FILTER_REQUEST){
             if(resultCode == RESULT_OK){
                 ArrayList<Condition> filterConditions =
@@ -176,10 +199,38 @@ public class SpreadsheetActivity extends Activity {
     }
 
     private void updateItemListView(){
-        ArrayAdapter<Item> adapter = new ArrayAdapter<>(
+        final ArrayAdapter<Item> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
                 spreadsheet.getSortedFilteredItemList());
         itemListView.setAdapter(adapter);
+        itemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Item item = adapter.getItem(position);
+                currentItem = item;
+                Intent intent;
+                intent = new Intent(SpreadsheetActivity.this, NewItemActivity.class);
+                intent.putExtra(NewItemActivity.INIT_VALUES, getValues(item));
+                intent.putExtra(NewItemActivity.IS_EDITING, true);
+                startActivityForResult(intent, EDIT_ITEM_REQUEST);
+            }
+        });
+    }
+
+    private ArrayList<String> getDefaultValues() {
+        ArrayList<String> list = new ArrayList<>();
+        for(FieldHeader f: spreadsheet.getHeader()){
+            list.add(FieldViewFactory.getDefaultValue(f.getType()));
+        }
+        return list;
+    }
+
+    private ArrayList<String> getValues(Item item){
+        ArrayList<String> list = new ArrayList<>();
+        for(Field f: item){
+            list.add(f.getValue());
+        }
+        return list;
     }
 }
