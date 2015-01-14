@@ -1,8 +1,26 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:buttonBarStyle">@style/MyButtonBar</item>
+        <item name="android:buttonBarButtonStyle">
+            @android:style/Widget.Holo.Button.Borderless</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <!-- ActionBar styles -->
+    <style name="MyActionBar"
+        parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/barColor</item>
+    </style>
+
+    <style name="MyButtonBar"
+        parent="@android:style/Holo.ButtonBar">
+        <item name="android:background">@color/barColor</item>
+        <item name="android:divider">#FFFFFF</item>
+        </style>
+    <color name="barColor">#006DD9</color>
+
 
 </resources>

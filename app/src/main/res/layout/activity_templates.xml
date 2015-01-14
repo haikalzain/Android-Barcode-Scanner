@@ -9,14 +9,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/linearLayout" >
+        android:id="@+id/linearLayout"
+        style="?android:buttonBarStyle">
 
         <Button
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:text="New Template"
             android:id="@+id/new_template_btn"
-            android:layout_weight="0.5" />
+            android:layout_weight="0.5"
+            style="?android:buttonBarButtonStyle"/>
 
         <Button
             android:layout_width="0dip"
