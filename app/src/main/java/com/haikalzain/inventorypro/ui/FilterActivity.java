@@ -50,25 +50,17 @@ public class FilterActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_container_three_btn);
+        setContentView(R.layout.activity_container_two_btn);
+        setTitle("Filter Items");
         contentLayout = (LinearLayout)findViewById(R.id.main_layout);
         fieldViews = new ArrayList<>();
 
+        Button cancelBtn = (Button)findViewById(R.id.btn_1);
+        Button doneBtn = (Button)findViewById(R.id.btn_2);
 
-        Button addBtn = (Button)findViewById(R.id.btn_1);
-        Button cancelBtn = (Button)findViewById(R.id.btn_2);
-        Button doneBtn = (Button)findViewById(R.id.btn_3);
-
-        addBtn.setText("Add Field...");
         cancelBtn.setText("Cancel");
         doneBtn.setText("Done");
 
-        addBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -92,7 +92,13 @@ public class NewItemActivity extends Activity {
                             this,
                             fieldTypes.get(i),
                             fieldNames.get(i));
-            contentLayout.addView(fieldView);
+
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            layoutParams.setMargins(0, 15, 0, 0);
+
+            contentLayout.addView(fieldView, layoutParams);
             fieldViews.add(fieldView);
         }
     }
