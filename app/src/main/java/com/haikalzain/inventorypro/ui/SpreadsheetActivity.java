@@ -2,17 +2,22 @@ package com.haikalzain.inventorypro.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
+
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 
@@ -25,6 +30,7 @@ import com.haikalzain.inventorypro.common.Spreadsheet;
 import com.haikalzain.inventorypro.common.conditions.Condition;
 import com.haikalzain.inventorypro.ui.dialogs.BarcodeDialog;
 import com.haikalzain.inventorypro.ui.dialogs.SortDialog;
+import com.haikalzain.inventorypro.ui.widgets.FieldView;
 import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
 
 import java.io.File;
@@ -56,7 +62,7 @@ public class SpreadsheetActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_three_btn);
+        setContentView(R.layout.activity_spreadsheet);
 
         app = (App)getApplication();
         spreadsheet = app.currentSpreadsheet;
@@ -206,7 +212,7 @@ public class SpreadsheetActivity extends Activity {
         if(spreadsheet == null){
             Log.e(TAG, "spreadsheet is null!");
         }
-        final ArrayAdapter<Item> adapter = new ArrayAdapter<>(
+        final ArrayAdapter<Item> adapter = new ItemsAdapter(
                 this,
                 android.R.layout.simple_list_item_1,
                 spreadsheet.getSortedFilteredItemList());
@@ -216,9 +222,44 @@ public class SpreadsheetActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Item item = adapter.getItem(position);
-                startEditItemActivity(item);
+                //startEditItemActivity(item);
             }
         });
+    }
+
+    private class ItemsAdapter extends ArrayAdapter<Item>{
+
+
+        public ItemsAdapter(Context context, int resource, List<Item> objects) {
+            super(context, resource, objects);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_item, parent, false);
+            }
+            final Item item = getItem(position);
+            LinearLayout linearLayout = (LinearLayout)convertView.findViewById(R.id.linear_layout);
+            linearLayout.removeAllViews();
+            for(Field field: item){
+
+                FieldView fieldView = FieldViewFactory.createFieldViewForType(
+                        getContext(), field.getType(), field.getName());
+                fieldView.setValue(field.getValue());
+                fieldView.disableInput();
+
+                linearLayout.addView(fieldView);
+            }
+            LinearLayout glassView = (LinearLayout)convertView.findViewById(R.id.glass_view);
+            glassView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startEditItemActivity(item);
+                }
+            });
+            return convertView;
+        }
     }
 
     private ArrayList<String> getDefaultValues() {
