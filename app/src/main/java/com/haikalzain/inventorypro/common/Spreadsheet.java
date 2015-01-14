@@ -121,6 +121,9 @@ public class Spreadsheet implements Serializable{
     }
 
     public Item getItem(String barcode){
+        if(barcode.equals("")){ // This means object has no barcode
+            return null;
+        }
         for(Item item: items){
             if(item.getField("Barcode").getValue().equals(barcode)){
                 return item;
@@ -188,7 +191,6 @@ public class Spreadsheet implements Serializable{
         Collections.sort(filtered, comparator);
         //Log.v(TAG, "Sorted list: " + filtered.toString());
         return filtered;
-        // TODO implement filter
     }
 
     //use null to unset sort
@@ -220,10 +222,6 @@ public class Spreadsheet implements Serializable{
 
     public void deleteItem(Item item){
         items.remove(item);
-    }
-
-    public void deleteItem(String barcode){
-        deleteItem(getItem(barcode));
     }
 
     public void exportExcelToFile(File excelFile) throws IOException{

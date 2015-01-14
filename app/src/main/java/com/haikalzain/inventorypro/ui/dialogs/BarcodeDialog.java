@@ -30,8 +30,9 @@ public class BarcodeDialog {
         LayoutInflater inflater = LayoutInflater.from(context);
         rootView = inflater.inflate(R.layout.dialog_new_template, null);
         builder = new AlertDialog.Builder(context);
-        builder.setTitle("Lookup Barcode")
+        builder.setTitle("Lookup/Add Barcode")
                 .setView(rootView)
+                .setMessage("Leave blank if your item doesn't have a barcode")
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -72,7 +73,6 @@ public class BarcodeDialog {
     public void show(){
         dialog = builder.create();
         dialog.show();
-        setPositiveButtonEnabled(false);
     }
 
     public String getBarcode(){
@@ -86,16 +86,5 @@ public class BarcodeDialog {
     }
 
     private void showErrors(){
-        String fileName = fileEdit.getText().toString();
-        boolean error = false;
-        if(fileName.equals("")){
-            error = true;
-            fileEdit.setError("Cannot be blank");
-        }
-        else{
-            fileEdit.setError(null);
-        }
-
-        setPositiveButtonEnabled(!error);
     }
 }
