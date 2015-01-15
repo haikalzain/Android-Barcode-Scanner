@@ -45,14 +45,6 @@ public class SpreadsheetsActivity extends Activity {
             }
         });
 
-        Button templatesBtn = (Button)findViewById(R.id.templates_btn);
-        templatesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SpreadsheetsActivity.this, TemplatesActivity.class));
-            }
-        });
-
         setTitle("Spreadsheets");
     }
 

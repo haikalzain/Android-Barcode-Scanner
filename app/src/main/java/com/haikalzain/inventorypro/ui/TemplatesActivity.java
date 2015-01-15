@@ -63,14 +63,6 @@ public class TemplatesActivity extends Activity {
 
             }
         });
-
-        Button filesBtn = (Button)findViewById(R.id.files_btn);
-        filesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
     }
 
     private void updateTemplateListView(){

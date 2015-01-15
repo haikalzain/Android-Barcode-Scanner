@@ -19,13 +19,6 @@
             android:id="@+id/new_template_btn"
             android:layout_weight="0.5"
             style="?android:buttonBarButtonStyle"/>
-
-        <Button
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:text="Files"
-            android:id="@+id/files_btn"
-            android:layout_weight="0.5" />
     </LinearLayout>
 
     <ListView

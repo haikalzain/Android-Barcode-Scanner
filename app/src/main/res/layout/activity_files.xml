@@ -20,12 +20,6 @@
             android:layout_weight="0.5"
             style="?android:buttonBarButtonStyle"/>
 
-        <Button
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:text="Templates"
-            android:id="@+id/templates_btn"
-            android:layout_weight="0.5" />
     </LinearLayout>
 
     <ListView
