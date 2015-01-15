@@ -229,6 +229,11 @@ public class SpreadsheetActivity extends Activity {
 
     private class ItemsAdapter extends ArrayAdapter<Item>{
 
+        private class ViewHolder{
+            LinearLayout linearLayout;
+            LinearLayout glassView;
+        }
+
 
         public ItemsAdapter(Context context, int resource, List<Item> objects) {
             super(context, resource, objects);
@@ -236,12 +241,21 @@ public class SpreadsheetActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder;
             if (convertView == null) {
+                viewHolder = new ViewHolder();
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_item, parent, false);
+                viewHolder.linearLayout = (LinearLayout)convertView.findViewById(R.id.linear_layout);
+                viewHolder.glassView = (LinearLayout)convertView.findViewById(R.id.glass_view);
+                convertView.setTag(viewHolder);
+
+            }
+            else{
+                viewHolder = (ViewHolder)convertView.getTag();
             }
             final Item item = getItem(position);
-            LinearLayout linearLayout = (LinearLayout)convertView.findViewById(R.id.linear_layout);
-            linearLayout.removeAllViews();
+
+            viewHolder.linearLayout.removeAllViews();
             for(Field field: item){
 
                 FieldView fieldView = FieldViewFactory.createFieldViewForType(
@@ -249,10 +263,10 @@ public class SpreadsheetActivity extends Activity {
                 fieldView.setValue(field.getValue());
                 fieldView.disableInput();
 
-                linearLayout.addView(fieldView);
+                viewHolder.linearLayout.addView(fieldView);
             }
-            LinearLayout glassView = (LinearLayout)convertView.findViewById(R.id.glass_view);
-            glassView.setOnClickListener(new View.OnClickListener() {
+
+            viewHolder.glassView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     startEditItemActivity(item);
