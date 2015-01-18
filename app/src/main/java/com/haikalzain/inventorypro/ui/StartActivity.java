@@ -47,7 +47,8 @@ public class StartActivity extends Activity {
         addMenuItem(R.drawable.sync, "Sync", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(StartActivity.this, SyncActivity.class);
+                startActivity(intent);
             }
         });
 

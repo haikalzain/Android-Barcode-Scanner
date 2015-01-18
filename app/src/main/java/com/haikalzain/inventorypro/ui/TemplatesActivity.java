@@ -16,6 +16,7 @@ import android.widget.ListView;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Spreadsheet;
 import com.haikalzain.inventorypro.ui.dialogs.NewTemplateDialog;
+import com.haikalzain.inventorypro.utils.DropboxUtils;
 import com.haikalzain.inventorypro.utils.FileUtils;
 
 import java.io.File;
@@ -115,6 +116,8 @@ public class TemplatesActivity extends Activity {
 
                 try{
                     template.exportExcelToFile(outfile);
+                    DropboxUtils.copyInFile(getApplicationContext(), outfile,
+                            DropboxUtils.getTemplatesPath(getApplicationContext()));
                 } catch (IOException e) {
                     Log.e(TAG, "Can't save file: " + outfile.toString());
                 }

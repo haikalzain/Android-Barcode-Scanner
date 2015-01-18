@@ -18,6 +18,7 @@ import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Spreadsheet;
 import com.haikalzain.inventorypro.ui.dialogs.NewSpreadsheetDialog;
+import com.haikalzain.inventorypro.utils.DropboxUtils;
 import com.haikalzain.inventorypro.utils.FileUtils;
 
 import java.io.File;
@@ -115,6 +116,8 @@ public class SpreadsheetsActivity extends Activity {
 
         try {
             spreadsheet.exportExcelToFile(outFile);
+            DropboxUtils.copyInFile(getApplicationContext(), outFile,
+                    DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
         } catch (IOException e) {
             Log.e(TAG, "Couldn't create spreadsheet: " + outFile.toString());
         }

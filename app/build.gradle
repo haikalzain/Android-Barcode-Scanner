@@ -26,3 +26,10 @@ dependencies {
     compile project(':jxl')
     compile 'me.dm7.barcodescanner:zbar:1.6'
 }
+
+android {
+    tasks.withType(com.android.build.gradle.tasks.PackageApplication) {
+        pkgTask -> pkgTask.jniFolders = new HashSet<File>();
+            pkgTask.jniFolders.add(new File(projectDir, 'libs'));
+    }
+}

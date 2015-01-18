@@ -32,6 +32,7 @@ import com.haikalzain.inventorypro.ui.dialogs.BarcodeDialog;
 import com.haikalzain.inventorypro.ui.dialogs.SortDialog;
 import com.haikalzain.inventorypro.ui.widgets.FieldView;
 import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
+import com.haikalzain.inventorypro.utils.DropboxUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -175,6 +176,8 @@ public class SpreadsheetActivity extends Activity {
                 spreadsheet.addItem(item);
                 try {
                     spreadsheet.exportExcelToFile(excelFile);
+                    DropboxUtils.copyInFile(getApplicationContext(), excelFile,
+                            DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
                 } catch (IOException e) {
                     Log.e(TAG, "failed to update: " + excelFile.toString());
                 }
@@ -189,6 +192,8 @@ public class SpreadsheetActivity extends Activity {
                 spreadsheet.addItem(item);
                 try {
                     spreadsheet.exportExcelToFile(excelFile);
+                    DropboxUtils.copyInFile(getApplicationContext(), excelFile,
+                            DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
                 } catch (IOException e) {
                     Log.e(TAG, "failed to update: " + excelFile.toString());
                 }

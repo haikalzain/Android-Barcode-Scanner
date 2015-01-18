@@ -21,6 +21,7 @@ import com.haikalzain.inventorypro.common.Item;
 import com.haikalzain.inventorypro.common.Spreadsheet;
 import com.haikalzain.inventorypro.common.conditions.Condition;
 import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
+import com.haikalzain.inventorypro.utils.DropboxUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -166,6 +167,8 @@ public class ScanActivity extends Activity {
                 spreadsheet.addItem(item);
                 try {
                     spreadsheet.exportExcelToFile(excelFile);
+                    DropboxUtils.copyInFile(getApplicationContext(), excelFile,
+                            DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
                 } catch (IOException e) {
                     Log.e(TAG, "failed to update: " + excelFile.toString());
                 }
@@ -179,6 +182,8 @@ public class ScanActivity extends Activity {
                 spreadsheet.addItem(item);
                 try {
                     spreadsheet.exportExcelToFile(excelFile);
+                    DropboxUtils.copyInFile(getApplicationContext(), excelFile,
+                            DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
                 } catch (IOException e) {
                     Log.e(TAG, "failed to update: " + excelFile.toString());
                 }
