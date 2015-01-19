@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
@@ -262,13 +264,37 @@ public class SpreadsheetActivity extends Activity {
 
             viewHolder.linearLayout.removeAllViews();
             for(Field field: item){
+                LinearLayout horizontalLayout = new LinearLayout(getContext());
+                horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-                FieldView fieldView = FieldViewFactory.createFieldViewForType(
-                        getContext(), field.getType(), field.getName());
-                fieldView.setValue(field.getValue());
-                fieldView.disableInput();
+                TextView labelView = new TextView(getContext());
+                labelView.setTextAppearance(getContext(),
+                        android.R.style.TextAppearance_DeviceDefault_Medium);
+                labelView.setText(field.getName() + ":");
+                labelView.setPadding(0 , 0, 10, 0);
+                labelView.setLayoutParams(new LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f));
+                horizontalLayout.addView(labelView);
 
-                viewHolder.linearLayout.addView(fieldView);
+                TextView valueView = new TextView(getContext());
+                valueView.setTextAppearance(getContext(),
+                        android.R.style.TextAppearance_DeviceDefault_Medium);
+                valueView.setText(field.getValue());
+                valueView.setBackgroundColor(0x87DFFAFF);
+                valueView.setPadding(30, 5, 3, 10);
+
+                horizontalLayout.addView(valueView, new LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        2f));
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0, 0, 0, 30);
+                viewHolder.linearLayout.addView(horizontalLayout, params);
             }
 
             viewHolder.glassView.setOnClickListener(new View.OnClickListener() {
