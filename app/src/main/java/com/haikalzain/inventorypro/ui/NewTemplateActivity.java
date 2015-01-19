@@ -37,7 +37,8 @@ public class NewTemplateActivity extends Activity {
 
     public static final String TEMPLATE_PARCEL = "TEMPLATE_PARCEL";
     public static final String TEMPLATE_NAME = "TEMPLATE_NAME";
-
+    public static final String IS_EDITING = "IS_EDITING";
+    public static final String HEADER = "HEADER";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,11 +82,22 @@ public class NewTemplateActivity extends Activity {
             }
         });
 
-        fieldsBuilder = new SpreadsheetHeader();
+        if(getIntent().getBooleanExtra(IS_EDITING, false)){
+            setTitle("Edit Item");
+            fieldsBuilder = (SpreadsheetHeader)getIntent().getSerializableExtra(HEADER);
+        }
+        else{
+            setTitle("New Template");
+            fieldsBuilder = new SpreadsheetHeader();
+        }
+
         List<FieldType> types = fieldsBuilder.getFieldTypes();
         List<String> names = fieldsBuilder.getFieldNames();
         for(int i = 0; i < fieldsBuilder.getFieldHeaderCount(); i++){
-            addFieldView(types.get(i), names.get(i), false);
+            boolean deletable = false;
+            if(i >= SpreadsheetHeader.getProtectedFieldsCount())
+                deletable = true;
+            addFieldView(types.get(i), names.get(i), deletable);
         }
     }
 

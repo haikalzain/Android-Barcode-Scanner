@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 
 import com.dropbox.sync.android.DbxException;
+import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Spreadsheet;
 import com.haikalzain.inventorypro.ui.dialogs.NewTemplateDialog;
@@ -34,6 +35,7 @@ public class TemplatesActivity extends Activity {
     private static final String TAG = "com.haikalzain.inventorypro.ui.TemplatesActivity";
 
     private static final int NEW_TEMPLATE_REQUEST = 1;
+    private static final int EDIT_TEMPLATE_REQUEST = NEW_TEMPLATE_REQUEST;
     private ListView templateListView;
 
     @Override
@@ -101,6 +103,14 @@ public class TemplatesActivity extends Activity {
                         android.R.layout.simple_list_item_1,
                         FileUtils.getFileNames(FileUtils.getTemplateFiles(TemplatesActivity.this)));
                 templateListView.setAdapter(adapter);
+
+                templateListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        openFile(adapter.getItem(position));
+
+                    }
+                });
 
                 // Delete menu
                 templateListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -208,5 +218,22 @@ public class TemplatesActivity extends Activity {
                 updateTemplateListView();
             }
         }
+    }
+
+    private void openFile(String fileName){
+        File file = new File(
+                FileUtils.getTemplatesDirectory(this),
+                fileName);
+        Spreadsheet spreadsheet = null;
+        try {
+            spreadsheet = Spreadsheet.createFromExcelFile(file);
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to read spreadsheet: " + file.toString());
+        }
+        Intent intent = new Intent(this, NewTemplateActivity.class);
+        intent.putExtra(NewTemplateActivity.TEMPLATE_NAME, FileUtils.getFileNameWithoutExt(fileName));
+        intent.putExtra(NewTemplateActivity.IS_EDITING, true);
+        intent.putExtra(NewTemplateActivity.HEADER, spreadsheet.getHeader());
+        startActivityForResult(intent, EDIT_TEMPLATE_REQUEST);
     }
 }
