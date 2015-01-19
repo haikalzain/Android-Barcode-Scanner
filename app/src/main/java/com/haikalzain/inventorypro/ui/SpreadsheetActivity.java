@@ -283,7 +283,7 @@ public class SpreadsheetActivity extends Activity {
                         android.R.style.TextAppearance_DeviceDefault_Medium);
                 valueView.setText(field.getValue());
                 valueView.setBackgroundColor(0x87DFFAFF);
-                valueView.setPadding(30, 5, 3, 10);
+                valueView.setPadding(30, 5, 30, 10);
 
                 horizontalLayout.addView(valueView, new LinearLayout.LayoutParams(
                         0,
