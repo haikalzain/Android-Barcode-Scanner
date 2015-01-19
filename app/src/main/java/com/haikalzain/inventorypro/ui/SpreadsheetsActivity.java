@@ -1,6 +1,7 @@
 package com.haikalzain.inventorypro.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,7 +16,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 
+import com.dropbox.sync.android.DbxException;
 import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Spreadsheet;
@@ -177,6 +180,45 @@ public class SpreadsheetsActivity extends Activity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         openFile(FileUtils.getFileNameWithoutExt(adapter.getItem(position)));
+                    }
+                });
+
+                // Delete menu
+                spreadsheetListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                        final int pos = position;
+                        final PopupMenu deleteItemMenu = new PopupMenu(SpreadsheetsActivity.this, view);
+                        deleteItemMenu.getMenu().add(Menu.NONE, 1, Menu.NONE, "Delete");
+                        deleteItemMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem menuItem) {
+                                switch (menuItem.getItemId()) {
+                                    case 1:
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(SpreadsheetsActivity.this);
+                                        builder.setTitle("Delete Spreadsheet")
+                                                .setMessage("Are you sure you want to delete " + adapter.getItem(pos))
+                                                .setNegativeButton("Cancel", null)
+                                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        FileUtils.deleteSpreadsheet(SpreadsheetsActivity.this, adapter.getItem(pos));
+                                                        try{
+                                                            DropboxUtils.deleteSpreadsheet(getApplicationContext(), adapter.getItem(pos));
+                                                        } catch (DbxException e) {
+                                                            Log.v(TAG, "Couldn't delete spreadsheet from dropbox");
+                                                        }
+                                                        updateSpreadsheetListView();
+                                                    }
+                                                });
+                                        builder.create().show();
+                                        break;
+                                }
+                                return false;
+                            }
+                        });
+                        deleteItemMenu.show();
+                        return true;
                     }
                 });
 

@@ -41,6 +41,14 @@ public class FileUtils {
         return new ArrayList<>(Arrays.asList(getSpreadsheetsDirectory(context).listFiles()));
     }
 
+    public static boolean deleteSpreadsheet(Context context, String fileName){
+        return new File(getSpreadsheetsDirectory(context), fileName).delete();
+    }
+
+    public static boolean deleteTemplate(Context context, String fileName){
+        return new File(getTemplatesDirectory(context), fileName).delete();
+    }
+
     public static List<String> getFileNamesWithoutExt(List<File> files){
         List<String> names = new ArrayList<>();
         for(File f: files){

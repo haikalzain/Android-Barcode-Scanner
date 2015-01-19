@@ -271,7 +271,7 @@ public class SpreadsheetActivity extends Activity {
                 labelView.setTextAppearance(getContext(),
                         android.R.style.TextAppearance_DeviceDefault_Medium);
                 labelView.setText(field.getName() + ":");
-                labelView.setPadding(0 , 0, 10, 0);
+                labelView.setPadding(0, 0, 10, 0);
                 labelView.setLayoutParams(new LinearLayout.LayoutParams(
                         0,
                         LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -297,10 +297,41 @@ public class SpreadsheetActivity extends Activity {
                 viewHolder.linearLayout.addView(horizontalLayout, params);
             }
 
+            final PopupMenu deleteItemMenu = new PopupMenu(getContext(), convertView);
+            deleteItemMenu.getMenu().add(Menu.NONE, 1, Menu.NONE, "Delete");
+            deleteItemMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case 1:
+                            spreadsheet.deleteItem(item);
+                            try {
+                                spreadsheet.exportExcelToFile(excelFile);
+                                DropboxUtils.copyInFile(getApplicationContext(), excelFile,
+                                        DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
+                            } catch (IOException e) {
+                                Log.v(TAG, "Failed to delete item");
+                            }
+                            updateItemListView();
+
+                            break;
+                    }
+                    return false;
+                }
+            });
+
             viewHolder.glassView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     startEditItemActivity(item);
+                }
+            });
+
+            viewHolder.glassView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    deleteItemMenu.show();
+                    return true;
                 }
             });
             return convertView;
