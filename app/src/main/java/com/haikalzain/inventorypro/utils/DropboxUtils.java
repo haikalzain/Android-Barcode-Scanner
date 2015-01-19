@@ -3,6 +3,7 @@ package com.haikalzain.inventorypro.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.dropbox.sync.android.DbxAccount;
 import com.dropbox.sync.android.DbxAccountManager;
@@ -27,6 +28,8 @@ import java.util.List;
  * Created by haikalzain on 18/01/15.
  */
 public class DropboxUtils {
+    private static String TAG = "com.haikalzain.inventorypro.utils.DropboxUtils";
+
     private static String getAppKey(Context context){
         return context.getString(R.string.dropbox_app_key);
     }
@@ -76,17 +79,23 @@ public class DropboxUtils {
     public static void setupSync(Context context)throws IOException {
         //Creating file system
         DbxFileSystem fileSystem = getDbxFileSystem(context);
-        String fileName = "Data";
+        String fileName = "/Data";
         DbxPath path = new DbxPath(fileName);
         int i = 1;
-        while(fileSystem.exists(path)){
-            path = new DbxPath(fileName + '(' + i + ')');
+
+        fileSystem.awaitFirstSync(); // Gets file data for first time
+
+        while(fileSystem.isFolder(path)){
+            path = new DbxPath(fileName + " (" + i + ')');
+            Log.v(TAG, "Trying folder: " + path.getName());
             i++;
         }
+
+        Log.v(TAG, "Creating Folder: " + path.getName());
         fileSystem.createFolder(path);
 
         SharedPreferences prefs = context.getSharedPreferences("sync", Context.MODE_PRIVATE);
-        prefs.edit().putString("SYNC_FOLDER", path.getName()).commit();
+        prefs.edit().putString("SYNC_FOLDER", path.toString()).commit();
 
         fileSystem.createFolder(new DbxPath(path, "spreadsheets"));
         fileSystem.createFolder(new DbxPath(path, "templates"));
@@ -138,51 +147,61 @@ public class DropboxUtils {
 
     public static void copyInFile(Context context, File excelFile, String destDirectory)
             throws IOException {
-        DbxFileSystem fileSystem = getDbxFileSystem(context);
-        DbxPath path = new DbxPath(destDirectory + '/' +excelFile.getName());
-        DbxFile file;
-        if(fileSystem.exists(path)){
-            file = fileSystem.open(path);
+        if(isLinked(context)) {
+            DbxFileSystem fileSystem = getDbxFileSystem(context);
+            DbxPath path = new DbxPath(destDirectory + '/' + excelFile.getName());
+            DbxFile file;
+            if (fileSystem.exists(path)) {
+                file = fileSystem.open(path);
+            } else {
+                file = fileSystem.create(path);
+            }
+            file.writeFromExistingFile(excelFile, false);
+            file.close();
         }
-        else{
-            file = fileSystem.create(path);
-        }
-        file.writeFromExistingFile(excelFile, false);
-        file.close();
     }
 
     public static void importFileFromDropbox(Context context, String fromPath, File toFile) throws IOException {
-        DbxFileSystem fileSystem = getDbxFileSystem(context);
-        DbxFile fromFile = fileSystem.create(new DbxPath(fromPath));
+        if(isLinked(context)) {
+            Log.v(TAG, "Importing " + fromPath + " to " + toFile.getPath());
 
-        InputStream in = fromFile.getReadStream();
-        OutputStream out = new FileOutputStream(toFile);
+            DbxFileSystem fileSystem = getDbxFileSystem(context);
+            DbxFile fromFile = fileSystem.open(new DbxPath(fromPath));
 
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
+            InputStream in = fromFile.getReadStream();
+            OutputStream out = new FileOutputStream(toFile);
+
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            fromFile.close();
+            out.close();
+
+            Log.v(TAG, "Import complete: " + toFile.getPath());
         }
-        fromFile.close();
-        out.close();
     }
 
     public static void importAllFromDropbox(Context context) throws IOException {
-        List<String> spreadsheets = FileUtils.getFileNames(FileUtils.getSpreadsheetFiles(context));
-        for(String fileName: getSpreadsheetFileNames(context)){
-            if(!spreadsheets.contains(fileName)){
-                String fromPath = getSpreadsheetsPath(context) + fileName;
-                File toFile = new File(FileUtils.getSpreadsheetsDirectory(context), fileName);
-                importFileFromDropbox(context, fromPath, toFile);
+        if(isLinked(context)) {
+            List<String> spreadsheets = FileUtils.getFileNames(FileUtils.getSpreadsheetFiles(context));
+            for (String fileName : getSpreadsheetFileNames(context)) {
+                if (!spreadsheets.contains(fileName)) {
+                    Log.v(TAG, "Preparing to import Spreadsheet");
+                    String fromPath = getSpreadsheetsPath(context) + '/' + fileName;
+                    File toFile = new File(FileUtils.getSpreadsheetsDirectory(context), fileName);
+                    importFileFromDropbox(context, fromPath, toFile);
+                }
             }
-        }
 
-        List<String> templates = FileUtils.getFileNames(FileUtils.getTemplateFiles(context));
-        for(String fileName: getTemplateFileNames(context)){
-            if(!templates.contains(fileName)){
-                String fromPath = getTemplatesPath(context) + fileName;
-                File toFile = new File(FileUtils.getTemplatesDirectory(context), fileName);
-                importFileFromDropbox(context, fromPath, toFile);
+            List<String> templates = FileUtils.getFileNames(FileUtils.getTemplateFiles(context));
+            for (String fileName : getTemplateFileNames(context)) {
+                if (!templates.contains(fileName)) {
+                    String fromPath = getTemplatesPath(context) + '/' + fileName;
+                    File toFile = new File(FileUtils.getTemplatesDirectory(context), fileName);
+                    importFileFromDropbox(context, fromPath, toFile);
+                }
             }
         }
     }

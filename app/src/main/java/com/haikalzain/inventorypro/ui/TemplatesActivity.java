@@ -1,14 +1,17 @@
 package com.haikalzain.inventorypro.ui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -67,16 +70,49 @@ public class TemplatesActivity extends Activity {
     }
 
     private void updateTemplateListView(){
-        try {
-            DropboxUtils.importAllFromDropbox(getApplicationContext());
-        } catch (IOException e) {
-            Log.v(TAG, "Dropbox import failed");
-        }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                FileUtils.getFileNames(FileUtils.getTemplateFiles(this)));
-        templateListView.setAdapter(adapter);
+        AsyncTask<String, Integer, Long> syncTask = new AsyncTask<String, Integer, Long>() {
+            private ProgressDialog dialog;
+            @Override
+            protected void onPreExecute() {
+                dialog = new ProgressDialog(TemplatesActivity.this);
+                dialog.setMessage("Syncing Files");
+
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        cancel(false);
+                        finish();
+                    }
+                });
+                dialog.show();
+            }
+
+            @Override
+            protected void onPostExecute(Long aLong) {
+                if(dialog.isShowing()){
+                    dialog.dismiss();
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        TemplatesActivity.this,
+                        android.R.layout.simple_list_item_1,
+                        FileUtils.getFileNames(FileUtils.getTemplateFiles(TemplatesActivity.this)));
+                templateListView.setAdapter(adapter);
+
+            }
+
+            @Override
+            protected Long doInBackground(String... params) {
+                try {
+                    DropboxUtils.importAllFromDropbox(getApplicationContext());
+                } catch (IOException e) {
+                    finish();
+                    Log.v(TAG, "Dropbox import failed");
+                }
+                return 0l;
+            }
+        };
+        syncTask.execute();
     }
 
 

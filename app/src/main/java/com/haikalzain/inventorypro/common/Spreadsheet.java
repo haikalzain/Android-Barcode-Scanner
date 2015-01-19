@@ -40,6 +40,8 @@ public class Spreadsheet implements Serializable{
 
     public static Spreadsheet createFromExcelFile(File inputFile) throws IOException{
 
+        Log.v(TAG, "Opening file: " + inputFile.getName());
+
         Workbook workbook;
         try {
             workbook = Workbook.getWorkbook(inputFile);

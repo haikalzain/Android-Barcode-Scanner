@@ -1,8 +1,10 @@
 package com.haikalzain.inventorypro.ui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -143,21 +145,54 @@ public class SpreadsheetsActivity extends Activity {
     }
 
     private void updateSpreadsheetListView(){
-        try {
-            DropboxUtils.importAllFromDropbox(getApplicationContext());
-        } catch (IOException e) {
-            Log.v(TAG, "Dropbox import failed");
-        }
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                FileUtils.getFileNames(FileUtils.getSpreadsheetFiles(this)));
-        spreadsheetListView.setAdapter(adapter);
-        spreadsheetListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        AsyncTask<String, Integer, Long> syncTask = new AsyncTask<String, Integer, Long>() {
+            private ProgressDialog dialog;
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openFile(FileUtils.getFileNameWithoutExt(adapter.getItem(position)));
+            protected void onPreExecute() {
+                dialog = new ProgressDialog(SpreadsheetsActivity.this);
+                dialog.setMessage("Syncing Files");
+
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        cancel(false);
+                        finish();
+                    }
+                });
+                dialog.show();
             }
-        });
+
+            @Override
+            protected void onPostExecute(Long aLong) {
+                if(dialog.isShowing()){
+                    dialog.dismiss();
+                }
+
+                final ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        SpreadsheetsActivity.this,
+                        android.R.layout.simple_list_item_1,
+                        FileUtils.getFileNames(FileUtils.getSpreadsheetFiles(SpreadsheetsActivity.this)));
+                spreadsheetListView.setAdapter(adapter);
+                spreadsheetListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        openFile(FileUtils.getFileNameWithoutExt(adapter.getItem(position)));
+                    }
+                });
+
+            }
+
+            @Override
+            protected Long doInBackground(String... params) {
+                try {
+                    DropboxUtils.importAllFromDropbox(getApplicationContext());
+                } catch (IOException e) {
+                    finish();
+                    Log.v(TAG, "Dropbox import failed");
+                }
+                return 0l;
+            }
+        };
+        syncTask.execute();
     }
 }
