@@ -15,7 +15,11 @@ import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Spreadsheet;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +35,7 @@ public class DropboxUtils {
         return context.getString(R.string.dropbox_app_secret);
     }
 
-    public boolean isLinked(Context context){ //queries dropbox itself, not local settings
+    public static boolean isLinked(Context context){ //queries dropbox itself, not local settings
         return getDbxAccountManager(context).hasLinkedAccount();
     }
 
@@ -97,12 +101,22 @@ public class DropboxUtils {
         }
     }
 
-    public static List<String> getSpreadsheetFileNames(Context context) throws DbxException.Unauthorized {
+    public static List<String> getSpreadsheetFileNames(Context context)
+            throws DbxException.Unauthorized {
+        return getDataFileNames(context, getSpreadsheetsPath(context));
+    }
+
+    public static List<String> getTemplateFileNames(Context context)
+            throws DbxException.Unauthorized {
+        return getDataFileNames(context, getTemplatesPath(context));
+    }
+
+    public static List<String> getDataFileNames(Context context, String folderPath) throws DbxException.Unauthorized {
         String folder = getSyncFolder(context);
         DbxFileSystem fileSystem = getDbxFileSystem(context);
         List<DbxFileInfo> list;
         try {
-            list = fileSystem.listFolder(new DbxPath(getSpreadsheetsPath(context)));
+            list = fileSystem.listFolder(new DbxPath(folderPath));
         }
         catch (DbxException e) {
             return new ArrayList<>();
@@ -113,8 +127,9 @@ public class DropboxUtils {
         for(DbxFileInfo fileInfo: list){
             if(!fileInfo.isFolder){
                 String fileName = fileInfo.path.getName();
+                String withoutExt = FileUtils.getFileNameWithoutExt(fileName);
                 if(fileName.endsWith(".xls")){
-                    result.add(FileUtils.getFileNameWithoutExt(fileName));
+                    result.add(fileName);
                 }
             }
         }
@@ -136,8 +151,40 @@ public class DropboxUtils {
         file.close();
     }
 
-    public static void copyOutFile(Context context, String fromPath, File toFile){
+    public static void importFileFromDropbox(Context context, String fromPath, File toFile) throws IOException {
+        DbxFileSystem fileSystem = getDbxFileSystem(context);
+        DbxFile fromFile = fileSystem.create(new DbxPath(fromPath));
 
+        InputStream in = fromFile.getReadStream();
+        OutputStream out = new FileOutputStream(toFile);
+
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        fromFile.close();
+        out.close();
+    }
+
+    public static void importAllFromDropbox(Context context) throws IOException {
+        List<String> spreadsheets = FileUtils.getFileNames(FileUtils.getSpreadsheetFiles(context));
+        for(String fileName: getSpreadsheetFileNames(context)){
+            if(!spreadsheets.contains(fileName)){
+                String fromPath = getSpreadsheetsPath(context) + fileName;
+                File toFile = new File(FileUtils.getSpreadsheetsDirectory(context), fileName);
+                importFileFromDropbox(context, fromPath, toFile);
+            }
+        }
+
+        List<String> templates = FileUtils.getFileNames(FileUtils.getTemplateFiles(context));
+        for(String fileName: getTemplateFileNames(context)){
+            if(!templates.contains(fileName)){
+                String fromPath = getTemplatesPath(context) + fileName;
+                File toFile = new File(FileUtils.getTemplatesDirectory(context), fileName);
+                importFileFromDropbox(context, fromPath, toFile);
+            }
+        }
     }
 
 }

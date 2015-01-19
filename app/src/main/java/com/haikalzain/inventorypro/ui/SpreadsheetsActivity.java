@@ -143,6 +143,11 @@ public class SpreadsheetsActivity extends Activity {
     }
 
     private void updateSpreadsheetListView(){
+        try {
+            DropboxUtils.importAllFromDropbox(getApplicationContext());
+        } catch (IOException e) {
+            Log.v(TAG, "Dropbox import failed");
+        }
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,

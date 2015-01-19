@@ -67,6 +67,11 @@ public class TemplatesActivity extends Activity {
     }
 
     private void updateTemplateListView(){
+        try {
+            DropboxUtils.importAllFromDropbox(getApplicationContext());
+        } catch (IOException e) {
+            Log.v(TAG, "Dropbox import failed");
+        }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,

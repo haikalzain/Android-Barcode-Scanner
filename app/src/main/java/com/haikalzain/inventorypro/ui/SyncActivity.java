@@ -20,7 +20,6 @@ import java.io.IOException;
 public class SyncActivity extends Activity {
     private static String TAG = "com.haikalzain.inventorypro.ui.SyncActivity";
 
-    private DbxAccountManager mDbxAcctMgr;
     private static final int LINK_DROPBOX = 0;
 
     private TextView textView;
@@ -32,7 +31,12 @@ public class SyncActivity extends Activity {
         setContentView(R.layout.activity_sync);
         textView = (TextView)findViewById(R.id.text_view);
         syncBtn = (Button)findViewById(R.id.button);
-        setSyncInactive();
+        if(DropboxUtils.isLinked(getApplicationContext())){
+            setSyncActive();
+        }
+        else{
+            setSyncInactive();
+        }
     }
 
     @Override
