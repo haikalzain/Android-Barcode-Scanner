@@ -10,8 +10,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ToggleButton;
 
 import com.haikalzain.inventorypro.App;
 import com.haikalzain.inventorypro.R;
@@ -46,6 +50,9 @@ public class ScanActivity extends Activity {
     private boolean autoFocus;
     private boolean flash;
 
+    private ToggleButton autofocusBtn;
+    private ToggleButton flashBtn;
+
     public static final String SCANNED_BARCODE = "SCANNED_BARCODE";
 
     @Override
@@ -59,6 +66,31 @@ public class ScanActivity extends Activity {
 
         autoFocus = true;
         flash = false;
+
+        autofocusBtn = (ToggleButton)findViewById(R.id.btn_1);
+        flashBtn = (ToggleButton)findViewById(R.id.btn_2);
+
+        autofocusBtn.setChecked(autoFocus);
+        flashBtn.setChecked(flash);
+
+        autofocusBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                autofocusBtn.setChecked(isChecked);
+                autoFocus = isChecked;
+                scannerView.setAutoFocus(isChecked);
+            }
+        });
+
+        flashBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                flashBtn.setChecked(isChecked);
+                flash = isChecked;
+                scannerView.setFlash(isChecked);
+            }
+        });
+
 
         FrameLayout layout = (FrameLayout)findViewById(R.id.main_layout);
 
