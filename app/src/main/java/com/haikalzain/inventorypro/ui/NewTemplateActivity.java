@@ -153,6 +153,11 @@ public class NewTemplateActivity extends Activity {
         Log.v(TAG, "adding field preview");
 
         final FieldView fieldView = FieldViewFactory.createFieldViewForType(this, fieldType, name);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, 0, 0, 15);
+        fieldPreview.setLayoutParams(params);
 
         ((FrameLayout)rootView.findViewById(R.id.container)).addView(fieldView);
         Button deleteBtn = ((Button)rootView.findViewById(R.id.delete_btn));

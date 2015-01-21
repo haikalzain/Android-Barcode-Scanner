@@ -197,7 +197,7 @@ public class SpreadsheetsActivity extends Activity {
                                     case 1:
                                         AlertDialog.Builder builder = new AlertDialog.Builder(SpreadsheetsActivity.this);
                                         builder.setTitle("Delete Spreadsheet")
-                                                .setMessage("Are you sure you want to delete " + adapter.getItem(pos))
+                                                .setMessage("Are you sure you want to delete " + adapter.getItem(pos) + "?")
                                                 .setNegativeButton("Cancel", null)
                                                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                                     @Override

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -79,9 +80,20 @@ public abstract class FieldView extends FrameLayout {
                 public void onClick(View v) {
                     if(disabledInput)
                         return;
+
+                    View inputView = createInputView(FieldView.this.context);
+                    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+                    params.setMargins(4, 16, 4, 4);
+                    inputView.setLayoutParams(params);
+                    FrameLayout layout = new FrameLayout(FieldView.this.context);
+                    layout.addView(inputView);
+                    //inputView.setPadding(4, 16, 4, 4);
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(FieldView.this.context);
                     builder.setTitle(FieldView.this.label)
-                           .setView(createInputView(FieldView.this.context))
+                           .setView(layout)
                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                @Override
                                public void onClick(DialogInterface dialog, int which) {

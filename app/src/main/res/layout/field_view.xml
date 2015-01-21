@@ -5,7 +5,8 @@
     android:id="@+id/linear_layout">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="0.3"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Medium Text"
@@ -13,7 +14,9 @@
         android:layout_gravity="center_vertical" />
 
     <FrameLayout
-        android:layout_width="fill_parent"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
+        android:layout_weight="0.6"
+        android:layout_marginLeft="10dp"
         android:id="@+id/input_container"></FrameLayout>
 </LinearLayout>

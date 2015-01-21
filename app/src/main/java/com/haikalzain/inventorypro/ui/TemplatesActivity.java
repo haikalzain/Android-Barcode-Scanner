@@ -126,7 +126,7 @@ public class TemplatesActivity extends Activity {
                                     case 1:
                                         AlertDialog.Builder builder = new AlertDialog.Builder(TemplatesActivity.this);
                                         builder.setTitle("Delete Template")
-                                                .setMessage("Are you sure you want to delete " + adapter.getItem(pos))
+                                                .setMessage("Are you sure you want to delete " + adapter.getItem(pos) + "?")
                                                 .setNegativeButton("Cancel", null)
                                                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                                     @Override

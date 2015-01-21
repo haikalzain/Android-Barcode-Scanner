@@ -50,6 +50,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/main_layout"
             android:orientation="vertical"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
              />
     </ScrollView>
 </RelativeLayout>
