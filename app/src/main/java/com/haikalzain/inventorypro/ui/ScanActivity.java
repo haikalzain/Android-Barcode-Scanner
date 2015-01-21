@@ -1,10 +1,12 @@
 package com.haikalzain.inventorypro.ui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -197,13 +199,7 @@ public class ScanActivity extends Activity {
                 ArrayList<String> item =
                         (ArrayList<String>)data.getSerializableExtra(NewItemActivity.ITEM);
                 spreadsheet.addItem(item);
-                try {
-                    spreadsheet.exportExcelToFile(excelFile);
-                    DropboxUtils.copyInFile(getApplicationContext(), excelFile,
-                            DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
-                } catch (IOException e) {
-                    Log.e(TAG, "failed to update: " + excelFile.toString());
-                }
+                saveSpreadsheet();
             }
         }
         else if(requestCode == EDIT_ITEM_REQUEST){
@@ -212,14 +208,42 @@ public class ScanActivity extends Activity {
                         (ArrayList<String>)data.getSerializableExtra(NewItemActivity.ITEM);
                 spreadsheet.deleteItem(app.currentItem);
                 spreadsheet.addItem(item);
+                saveSpreadsheet();
+            }
+        }
+    }
+
+    private void saveSpreadsheet(){
+        AsyncTask<String, Integer, Long> saveFileTask = new AsyncTask<String, Integer, Long>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                dialog = new ProgressDialog(ScanActivity.this);
+                dialog.setMessage("Saving " + excelFile.getName());
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Long doInBackground(String... params) {
+
                 try {
                     spreadsheet.exportExcelToFile(excelFile);
                     DropboxUtils.copyInFile(getApplicationContext(), excelFile,
                             DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
                 } catch (IOException e) {
-                    Log.e(TAG, "failed to update: " + excelFile.toString());
+                    Log.v(TAG, "Failed to save spreadsheet");
                 }
+                return 0l;
             }
-        }
+
+            @Override
+            protected void onPostExecute(Long aLong) {
+                if(dialog.isShowing())
+                    dialog.dismiss();
+            }
+        };
+        saveFileTask.execute();
     }
 }

@@ -129,22 +129,51 @@ public class SpreadsheetsActivity extends Activity {
     }
 
     private void openFile(String fileName){
-        File file = new File(
+        final File file = new File(
                 FileUtils.getSpreadsheetsDirectory(this),
                 fileName + ".xls");
-        Spreadsheet spreadsheet = null;
-        try {
-            spreadsheet = Spreadsheet.createFromExcelFile(file);
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to read spreadsheet: " + file.toString());
-        }
-        Intent intent = new Intent(this, SpreadsheetActivity.class);
 
-        App app = (App)getApplication();
-        app.currentSpreadsheet = spreadsheet;
-        app.currentExcelFile = file;
 
-        startActivity(intent);
+        AsyncTask<String, Integer, Long> openFileTask = new AsyncTask<String, Integer, Long>() {
+            private ProgressDialog dialog;
+            private Spreadsheet spreadsheet;
+            @Override
+            protected void onPreExecute() {
+                dialog = new ProgressDialog(SpreadsheetsActivity.this);
+                dialog.setMessage("Opening " + file.getName());
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Long doInBackground(String... params) {
+
+                try {
+                    spreadsheet = Spreadsheet.createFromExcelFile(file);
+                } catch (IOException e) {
+                    Log.e(TAG, "Failed to read spreadsheet: " + file.toString());
+                }
+                return 0l;
+            }
+
+            @Override
+            protected void onPostExecute(Long aLong) {
+                Intent intent = new Intent(SpreadsheetsActivity.this, SpreadsheetActivity.class);
+
+                App app = (App)getApplication();
+                app.currentSpreadsheet = spreadsheet;
+                app.currentExcelFile = file;
+
+                startActivity(intent);
+
+                if(dialog.isShowing())
+                    dialog.dismiss();
+
+            }
+        };
+        openFileTask.execute();
+
+
     }
 
     private void updateSpreadsheetListView(){

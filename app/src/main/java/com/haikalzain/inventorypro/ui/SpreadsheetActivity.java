@@ -2,11 +2,13 @@ package com.haikalzain.inventorypro.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -176,14 +178,7 @@ public class SpreadsheetActivity extends Activity {
                 ArrayList<String> item =
                         (ArrayList<String>)data.getSerializableExtra(NewItemActivity.ITEM);
                 spreadsheet.addItem(item);
-                try {
-                    spreadsheet.exportExcelToFile(excelFile);
-                    DropboxUtils.copyInFile(getApplicationContext(), excelFile,
-                            DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
-                } catch (IOException e) {
-                    Log.e(TAG, "failed to update: " + excelFile.toString());
-                }
-                updateItemListView();
+                saveSpreadsheet();
             }
         }
         else if(requestCode == EDIT_ITEM_REQUEST){
@@ -192,14 +187,7 @@ public class SpreadsheetActivity extends Activity {
                         (ArrayList<String>)data.getSerializableExtra(NewItemActivity.ITEM);
                 spreadsheet.deleteItem(app.currentItem);
                 spreadsheet.addItem(item);
-                try {
-                    spreadsheet.exportExcelToFile(excelFile);
-                    DropboxUtils.copyInFile(getApplicationContext(), excelFile,
-                            DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
-                } catch (IOException e) {
-                    Log.e(TAG, "failed to update: " + excelFile.toString());
-                }
-                updateItemListView();
+                saveSpreadsheet();
             }
         }
         else if(requestCode == FILTER_REQUEST){
@@ -216,22 +204,45 @@ public class SpreadsheetActivity extends Activity {
     }
 
     private void updateItemListView(){
-        if(spreadsheet == null){
-            Log.e(TAG, "spreadsheet is null!");
-        }
-        final ArrayAdapter<Item> adapter = new ItemsAdapter(
-                this,
-                android.R.layout.simple_list_item_1,
-                spreadsheet.getSortedFilteredItemList());
+        AsyncTask<String, Integer, Long> refreshTask = new AsyncTask<String, Integer, Long>() {
+            private ProgressDialog dialog;
+            private ArrayAdapter<Item> adapter;
+            private List<Item> sortedFilteredItemList;
 
-        itemListView.setAdapter(adapter);
-        itemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Item item = adapter.getItem(position);
-                //startEditItemActivity(item);
+            protected void onPreExecute() {
+                dialog = new ProgressDialog(SpreadsheetActivity.this);
+                dialog.setMessage("Refreshing spreadsheet");
+                dialog.setCancelable(false);
+                dialog.show();
             }
-        });
+
+            @Override
+            protected Long doInBackground(String... params) {
+                sortedFilteredItemList = spreadsheet.getSortedFilteredItemList();
+                adapter = new ItemsAdapter(
+                        SpreadsheetActivity.this,
+                        android.R.layout.simple_list_item_1,
+                        sortedFilteredItemList);
+                return 0l;
+            }
+
+            @Override
+            protected void onPostExecute(Long aLong) {
+                itemListView.setAdapter(adapter);
+                itemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Item item = adapter.getItem(position);
+                        //startEditItemActivity(item);
+                    }
+                });
+                setTitle(excelFile.getName() + " - " + sortedFilteredItemList.size() + " item(s)");
+                if(dialog.isShowing())
+                    dialog.dismiss();
+            }
+        };
+        refreshTask.execute();
     }
 
     private class ItemsAdapter extends ArrayAdapter<Item>{
@@ -305,14 +316,7 @@ public class SpreadsheetActivity extends Activity {
                     switch (menuItem.getItemId()) {
                         case 1:
                             spreadsheet.deleteItem(item);
-                            try {
-                                spreadsheet.exportExcelToFile(excelFile);
-                                DropboxUtils.copyInFile(getApplicationContext(), excelFile,
-                                        DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
-                            } catch (IOException e) {
-                                Log.v(TAG, "Failed to delete item");
-                            }
-                            updateItemListView();
+                            saveSpreadsheet();
 
                             break;
                     }
@@ -336,6 +340,41 @@ public class SpreadsheetActivity extends Activity {
             });
             return convertView;
         }
+    }
+
+    private void saveSpreadsheet(){
+        AsyncTask<String, Integer, Long> saveFileTask = new AsyncTask<String, Integer, Long>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                dialog = new ProgressDialog(SpreadsheetActivity.this);
+                dialog.setMessage("Saving " + excelFile.getName());
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Long doInBackground(String... params) {
+
+                try {
+                    spreadsheet.exportExcelToFile(excelFile);
+                    DropboxUtils.copyInFile(getApplicationContext(), excelFile,
+                            DropboxUtils.getSpreadsheetsPath(getApplicationContext()));
+                } catch (IOException e) {
+                    Log.v(TAG, "Failed to save spreadsheet");
+                }
+                return 0l;
+            }
+
+            @Override
+            protected void onPostExecute(Long aLong) {
+                if(dialog.isShowing())
+                    dialog.dismiss();
+                updateItemListView();
+            }
+        };
+        saveFileTask.execute();
     }
 
     private ArrayList<String> getDefaultValues() {

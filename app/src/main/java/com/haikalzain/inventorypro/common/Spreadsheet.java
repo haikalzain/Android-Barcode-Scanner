@@ -144,7 +144,7 @@ public class Spreadsheet implements Serializable{
             boolean accept = true;
             for(int i = 0; i < item.getFieldCount(); i++){
                 Condition condition = filterConditions.get(i);
-                Log.v(TAG, "Condition: " + condition.toString());
+
                 if(condition.toString().equals("None")){
                     continue;
                 }
