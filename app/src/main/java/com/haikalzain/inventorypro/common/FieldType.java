@@ -9,6 +9,9 @@ public enum FieldType implements Serializable{
     TEXT("Text"),
     LONG_TEXT("Long Text"), //i.e. multiline
     DATE("Date"),
+    TIME("Time"),
+    RATING("Rating"),
+    YES_NO("Yes/No"),
     DAY("Day"),
     NUMBER("Number"),
     POSITIVE_NUMBER("Positive Number"),

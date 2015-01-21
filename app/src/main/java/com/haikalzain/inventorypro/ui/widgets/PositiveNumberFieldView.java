@@ -19,9 +19,9 @@ public class PositiveNumberFieldView extends FieldView {
     @Override
     protected View createInputView(Context context) {
         numberPicker = new NumberPicker(context);
-        numberPicker.setMinValue(1);
+        numberPicker.setMinValue(0);
         numberPicker.setMaxValue(1000000000);
-        numberPicker.setValue(1);
+        numberPicker.setValue(0);
 
         return numberPicker;
     }
@@ -33,7 +33,6 @@ public class PositiveNumberFieldView extends FieldView {
 
     @Override
     protected String getInputDataString() {
-        //TODO check integrity
         return String.valueOf(numberPicker.getValue());
     }
 
@@ -47,8 +46,4 @@ public class PositiveNumberFieldView extends FieldView {
         numberPicker.setValue(Integer.parseInt(dataString));
     }
 
-    @Override
-    protected String getDefaultValue(){
-        return "1";
-    }
 }

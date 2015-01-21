@@ -67,7 +67,6 @@ public abstract class FieldView extends FrameLayout {
 
         if(!isDialog){
             layout.addView(createInputView(context));
-            setValue(getDefaultValue());
         }
         else{
             Log.v(TAG, "Creating dialog");
@@ -148,7 +147,7 @@ public abstract class FieldView extends FrameLayout {
     }
 
     protected String getDefaultValue(){
-        return "";
+        return FieldViewFactory.getDefaultValue(getFieldType());
     }
 
     public String getDataString(){

@@ -59,9 +59,4 @@ public class NumberFieldView extends FieldView {
         return true;
     }
 
-    @Override
-    protected String getDefaultValue(){
-        return "0";
-    }
-
 }
