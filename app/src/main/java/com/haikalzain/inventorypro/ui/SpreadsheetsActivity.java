@@ -79,6 +79,16 @@ public class SpreadsheetsActivity extends Activity {
 
     private void showNewFileDialog(){
 
+        if(FileUtils.getTemplateFiles(this).isEmpty()){ // No templates
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("No Templates")
+                    .setMessage("You need to create a template first")
+                    .setPositiveButton("OK", null)
+                    .create()
+                    .show();
+            return;
+        }
+
         final NewSpreadsheetDialog dialog = new NewSpreadsheetDialog(
                 SpreadsheetsActivity.this,
                 "New Spreadsheet",

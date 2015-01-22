@@ -116,7 +116,7 @@ public class FieldViewFactory {
             case PRICE:
                 return "0.00";
             case RATING:
-                return "5.0";
+                return "5";
             case YES_NO:
                 return "No";
             default:

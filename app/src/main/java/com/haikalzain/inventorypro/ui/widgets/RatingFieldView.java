@@ -48,7 +48,7 @@ public class RatingFieldView extends FieldView {
 
     @Override
     public void setInputViewValue(String dataString) {
-        ratingBar.setRating(Integer.parseInt(dataString));
+        ratingBar.setRating(Float.parseFloat(dataString));
     }
 
     @Override

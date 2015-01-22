@@ -93,6 +93,9 @@ public class NewItemActivity extends Activity {
                             fieldTypes.get(i),
                             fieldNames.get(i));
 
+            if(i == 0) //prevent barcode from being edited
+                fieldView.disableInput();
+
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 

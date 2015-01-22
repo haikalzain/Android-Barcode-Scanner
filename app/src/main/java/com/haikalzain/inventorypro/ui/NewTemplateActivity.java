@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +27,7 @@ import com.haikalzain.inventorypro.common.Spreadsheet;
 import com.haikalzain.inventorypro.common.SpreadsheetHeader;
 import com.haikalzain.inventorypro.ui.widgets.FieldView;
 import com.haikalzain.inventorypro.ui.widgets.FieldViewFactory;
+import com.haikalzain.inventorypro.utils.FileUtils;
 
 import java.util.List;
 
@@ -102,11 +105,11 @@ public class NewTemplateActivity extends Activity {
     }
 
     private void showAddFieldDialog() {
-        //TODO input validation
         final View rootView = getLayoutInflater().inflate(R.layout.dialog_new_field, null);
 
         final EditText editText = (EditText) rootView.findViewById(R.id.edit_text);
         final Spinner typeSpinner = (Spinner) rootView.findViewById(R.id.spinner);
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add New Field")
@@ -133,8 +136,43 @@ public class NewTemplateActivity extends Activity {
                 FieldViewFactory.getFieldTypes());
         typeSpinner.setAdapter(adapter);
 
-        AlertDialog dialog = builder.create();
+        final AlertDialog dialog = builder.create();
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                boolean error = false;
+                String fieldName = editText.getText().toString();
+                if(fieldName.equals("")){
+                    error = true;
+                    editText.setError("Cannot be blank");
+                }
+                else if(!fieldName.trim().equals(fieldName)){
+                    error = true;
+                    editText.setError("No leading/trailing whitespace allowed");
+                }
+                else if(fieldsBuilder.getFieldNames().contains(fieldName)){
+                    error = true;
+                    editText.setError("Field already exists");
+                }
+                else{
+                    editText.setError(null);
+                }
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(!error);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         dialog.show();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
     }
 
     private void addField(FieldType fieldType, String name){

@@ -278,6 +278,7 @@ public class Spreadsheet implements Serializable{
     private static FieldHeader decodeField(String encodedField){
         String[] strings = encodedField.split("[()]");
         String name = strings[0];
+        name = name.trim();
         FieldType type = FieldType.getFieldTypeFromString(strings[1]);
 
         return new FieldHeader(type, name);
