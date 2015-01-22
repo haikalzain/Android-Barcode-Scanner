@@ -50,7 +50,6 @@ public class NewTemplateActivity extends Activity {
         contentLayout = (LinearLayout)findViewById(R.id.main_layout);
 
         templateName = getIntent().getStringExtra(TEMPLATE_NAME);
-        setTitle(templateName);
 
         Button addBtn = (Button)findViewById(R.id.btn_1);
         Button cancelBtn = (Button)findViewById(R.id.btn_2);
@@ -86,11 +85,11 @@ public class NewTemplateActivity extends Activity {
         });
 
         if(getIntent().getBooleanExtra(IS_EDITING, false)){
-            setTitle("Edit Item");
+            setTitle("Edit Template - " + templateName + ".xls");
             fieldsBuilder = (SpreadsheetHeader)getIntent().getSerializableExtra(HEADER);
         }
         else{
-            setTitle("New Template");
+            setTitle("New Template - " + templateName + ".xls");
             fieldsBuilder = new SpreadsheetHeader();
         }
 
@@ -213,28 +212,5 @@ public class NewTemplateActivity extends Activity {
     private void removeField(FieldType fieldType, String name, View fieldView){
         fieldsBuilder.removeFieldHeader(name);
         contentLayout.removeView(fieldView);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_new_template, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

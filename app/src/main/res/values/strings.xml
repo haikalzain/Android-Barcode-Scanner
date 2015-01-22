@@ -10,8 +10,8 @@
     <string name="title_activity_spreadsheet">SpreadsheetActivity</string>
     <string name="title_activity_new_item">NewItemActivity</string>
     <string name="title_activity_filter">FilterActivity</string>
-    <string name="title_activity_scan">ScanActivity</string>
-    <string name="title_activity_sync">SyncActivity</string>
+    <string name="title_activity_scan">Barcode Scanner</string>
+    <string name="title_activity_sync">Dropbox Sync</string>
     <string name="dropbox_app_key">7tx5599fgz8csnb</string>
     <string name="dropbox_app_secret">d81qid9hs2db6wz</string>
     <string name="sync_folder_pref_key">SYNC_FOLDER</string>
