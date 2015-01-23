@@ -30,5 +30,6 @@
     under the Apache License 2.0 and jExcelApi by Andy Khan released under the LGPL license.
     The Apache License is available here: http://www.apache.org/licenses/LICENSE-2.0. The LGPL License is available here: https://www.gnu.org/licenses/lgpl.html.</string>
     <string name="title_activity_about">About</string>
+    <string name="support_text">If you are having trouble with the app, wish to report bugs or make feature requests please email our support at dribbleau@gmail.com. We will reply as soon as possible.</string>
 
 </resources>
