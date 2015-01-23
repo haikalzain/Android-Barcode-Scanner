@@ -52,10 +52,11 @@ public class StartActivity extends Activity {
             }
         });
 
-        addMenuItem(R.drawable.ic_launcher, "Email", new View.OnClickListener() {
+        addMenuItem(R.drawable.about, "About", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(StartActivity.this, AboutActivity.class);
+                startActivity(intent);
             }
         });
     }

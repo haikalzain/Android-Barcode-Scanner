@@ -1,6 +1,8 @@
 package com.haikalzain.inventorypro.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
@@ -22,15 +24,16 @@ public class SyncActivity extends Activity {
 
     private static final int LINK_DROPBOX = 0;
 
-    private TextView textView;
+    private TextView statusText, folderText;
     private Button syncBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sync);
-        textView = (TextView)findViewById(R.id.text_view);
-        syncBtn = (Button)findViewById(R.id.button);
+        statusText = (TextView)findViewById(R.id.status_text);
+        folderText = (TextView)findViewById(R.id.folder_text);
+        syncBtn = (Button)findViewById(R.id.btn_1);
         if(DropboxUtils.isLinked(getApplicationContext())){
             setSyncActive();
         }
@@ -62,21 +65,35 @@ public class SyncActivity extends Activity {
     }
 
     private void setSyncActive(){
-        textView.setText(
-                "AutoSynced to Dropbox folder: " +
-                        DropboxUtils.getSyncFolder(getApplicationContext()));
+        statusText.setText("Sync Active");
+        folderText.setText(
+                "Apps/" +
+                getString(R.string.app_name) +
+                DropboxUtils.getSyncFolder(getApplicationContext()));
         syncBtn.setText("Unlink Dropbox");
         syncBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DropboxUtils.unlink(getApplicationContext());
-                setSyncInactive();
+                AlertDialog.Builder builder = new AlertDialog.Builder(SyncActivity.this);
+                builder.setTitle("Unlink Dropbox")
+                        .setMessage("Are you sure you want to unlink Dropbox?")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DropboxUtils.unlink(getApplicationContext());
+                                setSyncInactive();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create().show();
+
             }
         });
     }
 
     private void setSyncInactive(){
-        textView.setText("Not Synced");
+        statusText.setText("Not Synced");
+        folderText.setText("---");
         syncBtn.setText("Link Dropbox");
         syncBtn.setOnClickListener(new View.OnClickListener() {
             @Override

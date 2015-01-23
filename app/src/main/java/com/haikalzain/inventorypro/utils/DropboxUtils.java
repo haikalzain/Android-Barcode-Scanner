@@ -207,13 +207,17 @@ public class DropboxUtils {
     }
 
     public static void deleteSpreadsheet(Context context, String fileName) throws DbxException {
-        DbxPath path = new DbxPath(new DbxPath(getSpreadsheetsPath(context)), fileName);
-        getDbxFileSystem(context).delete(path);
+        if(isLinked(context)) {
+            DbxPath path = new DbxPath(new DbxPath(getSpreadsheetsPath(context)), fileName);
+            getDbxFileSystem(context).delete(path);
+        }
     }
 
     public static void deleteTemplate(Context context, String fileName) throws DbxException {
-        DbxPath path = new DbxPath(new DbxPath(getTemplatesPath(context)), fileName);
-        getDbxFileSystem(context).delete(path);
+        if(isLinked(context)) {
+            DbxPath path = new DbxPath(new DbxPath(getTemplatesPath(context)), fileName);
+            getDbxFileSystem(context).delete(path);
+        }
     }
 
 }

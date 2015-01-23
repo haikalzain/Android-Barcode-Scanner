@@ -15,5 +15,20 @@
     <string name="dropbox_app_key">7tx5599fgz8csnb</string>
     <string name="dropbox_app_secret">d81qid9hs2db6wz</string>
     <string name="sync_folder_pref_key">SYNC_FOLDER</string>
+    <string name="sync_import_text">Navigate to your Dropbox folder(above) on your PC.
+        Drag and drop spreadsheets into the folder "spreadsheets" and templates into the folder
+        "templates".</string>
+    <string name="sync_backup_text">If sync is enabled, any spreadsheets or templates you create/edit/scan
+    will automatically be synced to the cloud. If you have Dropbox installed on your PC, you will also receive real-time notifications
+    as you update your spreadsheets/templates.</string>
+    <string name="about_text">InventoryScan Pro and InventoryScan Free are copyright Dribble Apps. If you liked InventoryScan Free, please consider upgrading
+     to InventoryScan Pro to support the developers.
+     </string>
+    <string name="credits_text">We\'d
+    like to acknowledge the following companies/individuals for making this app possible:
+    Google - for the Android OS, Amazon - for the App Store, dm77 and zbar for their barcodescanner library released
+    under the Apache License 2.0 and jExcelApi by Andy Khan released under the LGPL license.
+    The Apache License is available here: http://www.apache.org/licenses/LICENSE-2.0. The LGPL License is available here: https://www.gnu.org/licenses/lgpl.html.</string>
+    <string name="title_activity_about">About</string>
 
 </resources>
