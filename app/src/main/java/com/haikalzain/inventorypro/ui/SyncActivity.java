@@ -68,7 +68,7 @@ public class SyncActivity extends Activity {
         statusText.setText("Sync Active");
         folderText.setText(
                 "Apps/" +
-                getString(R.string.app_name) +
+                getString(R.string.app_name) + "\n" +
                 DropboxUtils.getSyncFolder(getApplicationContext()));
         syncBtn.setText("Unlink Dropbox");
         syncBtn.setOnClickListener(new View.OnClickListener() {
