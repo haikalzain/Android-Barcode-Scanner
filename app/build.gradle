@@ -17,6 +17,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    productFlavors {
+        pro {
+            applicationId "com.haikalzain.inventorypro"
+            buildConfigField "boolean", "IS_FREE", "false"
+        }
+        free {
+            applicationId "com.haikalzain.inventoryfree"
+            buildConfigField "boolean", "IS_FREE", "true"
+        }
+    }
 }
 
 dependencies {
@@ -29,7 +40,8 @@ dependencies {
 
 android {
     tasks.withType(com.android.build.gradle.tasks.PackageApplication) {
-        pkgTask -> pkgTask.jniFolders = new HashSet<File>();
+        pkgTask ->
+            pkgTask.jniFolders = new HashSet<File>();
             pkgTask.jniFolders.add(new File(projectDir, 'libs'));
     }
 }
