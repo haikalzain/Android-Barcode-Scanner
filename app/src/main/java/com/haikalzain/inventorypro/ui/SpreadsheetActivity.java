@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -26,6 +27,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.haikalzain.inventorypro.App;
+import com.haikalzain.inventorypro.BuildConfig;
 import com.haikalzain.inventorypro.R;
 import com.haikalzain.inventorypro.common.Field;
 import com.haikalzain.inventorypro.common.FieldHeader;
@@ -182,45 +184,66 @@ public class SpreadsheetActivity extends Activity {
     }
 
     private void updateItemListView(){
-        AsyncTask<String, Integer, Long> refreshTask = new AsyncTask<String, Integer, Long>() {
-            private ProgressDialog dialog;
-            private ArrayAdapter<Item> adapter;
-            private List<Item> sortedFilteredItemList;
+        if(BuildConfig.IS_FREE && spreadsheet.getItemCount() > 15){
+            AlertDialog.Builder builder = new AlertDialog.Builder(SpreadsheetActivity.this);
+            builder.setTitle("Upgrade")
+                    .setMessage("This file contains more than 15 items, you need to upgrade to open it.")
+                    .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setPositiveButton("Upgrade", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.amazon.com/gp/mas/dl/android?p=com.haikalzain.inventorypro"));
+                            startActivity(intent);
+                        }
+                    })
+                    .create().show();
+        }
+        else {
+            AsyncTask<String, Integer, Long> refreshTask = new AsyncTask<String, Integer, Long>() {
+                private ProgressDialog dialog;
+                private ArrayAdapter<Item> adapter;
+                private List<Item> sortedFilteredItemList;
 
-            @Override
-            protected void onPreExecute() {
-                dialog = new ProgressDialog(SpreadsheetActivity.this);
-                dialog.setMessage("Refreshing spreadsheet");
-                dialog.setCancelable(false);
-                dialog.show();
-            }
+                @Override
+                protected void onPreExecute() {
+                    dialog = new ProgressDialog(SpreadsheetActivity.this);
+                    dialog.setMessage("Refreshing spreadsheet");
+                    dialog.setCancelable(false);
+                    dialog.show();
+                }
 
-            @Override
-            protected Long doInBackground(String... params) {
-                sortedFilteredItemList = spreadsheet.getSortedFilteredItemList();
-                adapter = new ItemsAdapter(
-                        SpreadsheetActivity.this,
-                        android.R.layout.simple_list_item_1,
-                        sortedFilteredItemList);
-                return 0l;
-            }
+                @Override
+                protected Long doInBackground(String... params) {
+                    sortedFilteredItemList = spreadsheet.getSortedFilteredItemList();
+                    adapter = new ItemsAdapter(
+                            SpreadsheetActivity.this,
+                            android.R.layout.simple_list_item_1,
+                            sortedFilteredItemList);
+                    return 0l;
+                }
 
-            @Override
-            protected void onPostExecute(Long aLong) {
-                itemListView.setAdapter(adapter);
-                itemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Item item = adapter.getItem(position);
-                        //startEditItemActivity(item);
-                    }
-                });
-                setTitle(excelFile.getName() + " - " + sortedFilteredItemList.size() + " item(s)");
-                if(dialog.isShowing())
-                    dialog.dismiss();
-            }
-        };
-        refreshTask.execute();
+                @Override
+                protected void onPostExecute(Long aLong) {
+                    itemListView.setAdapter(adapter);
+                    itemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Item item = adapter.getItem(position);
+                            //startEditItemActivity(item);
+                        }
+                    });
+                    setTitle(excelFile.getName() + " - " + sortedFilteredItemList.size() + " item(s)");
+                    if (dialog.isShowing())
+                        dialog.dismiss();
+                }
+            };
+            refreshTask.execute();
+        }
     }
 
     private class ItemsAdapter extends ArrayAdapter<Item>{
