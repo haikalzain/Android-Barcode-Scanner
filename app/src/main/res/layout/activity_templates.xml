@@ -1,14 +1,26 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.haikalzain.inventorypro.ui.TemplatesActivity">
 
+    <ListView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:id="@+id/list_view" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/delete_instructions"
+        android:id="@+id/textView12"
+        android:layout_gravity="center_horizontal"
+        android:padding="5dp" />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:id="@+id/linearLayout"
         style="?android:buttonBarStyle">
 
@@ -21,11 +33,5 @@
             style="?android:buttonBarButtonStyle"/>
     </LinearLayout>
 
-    <ListView
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:id="@+id/list_view"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/linearLayout"
-        android:layout_centerHorizontal="true" />
-</RelativeLayout>
+
+</LinearLayout>

@@ -8,8 +8,8 @@ android {
         applicationId "com.haikalzain.inventorypro"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
     buildTypes {
         release {
@@ -28,7 +28,15 @@ android {
             buildConfigField "boolean", "IS_FREE", "true"
         }
     }
+
+    sourceSets{
+
+        main{
+            jniLibs.srcDir 'libs'
+        }
+    }
 }
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -37,11 +45,11 @@ dependencies {
     compile project(':jxl')
     compile 'me.dm7.barcodescanner:zbar:1.6'
 }
-
+/*
 android {
     tasks.withType(com.android.build.gradle.tasks.PackageApplication) {
         pkgTask ->
             pkgTask.jniFolders = new HashSet<File>();
             pkgTask.jniFolders.add(new File(projectDir, 'libs'));
     }
-}
+}*/

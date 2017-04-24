@@ -15,6 +15,7 @@
     <string name="dropbox_app_key">7tx5599fgz8csnb</string>
     <string name="dropbox_app_secret">d81qid9hs2db6wz</string>
     <string name="sync_folder_pref_key">SYNC_FOLDER</string>
+    <string name="delete_instructions">Press and hold item/file to delete</string>
     <string name="sync_import_text">Navigate to your Dropbox folder(above) on your PC.
         Drag and drop spreadsheets into the folder "spreadsheets" and templates into the folder
         "templates".</string>
